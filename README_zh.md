@@ -197,7 +197,7 @@ python -m valen.train --config configs/train/qwen/sft_shared_state_full_joint.js
 欢迎扫描下方二维码加入 Valen 微信群，一起讨论项目、交流使用体验和实验结果。
 
 <p align="center">
-  <img src="assets/figures/wechat_1013.jpg" alt="Valen 微信讨论群二维码" width="200">
+  <img src="assets/figures/wechat_1020.jpg" alt="Valen 微信讨论群二维码" width="200">
 </p>
 
 <a id="许可与致谢"></a>
