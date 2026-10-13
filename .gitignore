@@ -38,3 +38,6 @@ htmlcov/
 *.pt
 *.pth
 *.safetensors
+*.onnx
+*.gguf
+*-weights-*.data

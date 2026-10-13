@@ -1,13 +1,13 @@
 """Complete games on published eval maps, with separately named legacy Sokoban."""
 import argparse
 from collections import defaultdict
-import hashlib
 import json
 from pathlib import Path
 import shutil
 import time
 
 from valen.training.distributed import initialize, close
+from valen.training.checkpoint import file_sha256
 from evaluation.sokoban.evaluate import ValenPolicy, MemoizedPolicy, run_episode as legacy_episode, summarize as legacy_summary
 from .dataset import eval_maps, make_game, validate_initial_frame, action_request, solution
 
@@ -85,8 +85,9 @@ def run(checkpoint, datasets, output, legacy_eval_dir=None, device="cuda", oracl
             raise ValueError("Legacy Sokoban level/reference coverage mismatch")
     policy = MemoizedPolicy(ValenPolicy(checkpoint, context.device)) if not oracle else None
     identity = {"protocol": "complete published eval maps from initial state", "world_size": context.world_size,
-                "checkpoint": str(checkpoint), "checkpoint_sha256": hashlib.sha256((checkpoint/"checkpoint.pt").read_bytes()).hexdigest() if checkpoint else None,
-                "datasets_sha256": {p.name+":"+str(p): hashlib.sha256(p.read_bytes()).hexdigest() for p in datasets},
+                # 全参数断点较大，逐块读取。 / Stream hashes of full-training checkpoints.
+                "checkpoint": str(checkpoint), "checkpoint_sha256": file_sha256(checkpoint/"checkpoint.pt") if checkpoint else None,
+                "datasets_sha256": {p.name+":"+str(p): file_sha256(p) for p in datasets},
                 "privileged_oracle": oracle, "memoize": not oracle,
                 "memoization_key": "visible image SHA and full request only",
                 "legacy_eval_dir": str(legacy_eval_dir) if legacy_eval_dir else None}

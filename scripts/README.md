@@ -8,6 +8,7 @@
 | `train/` | 按配置运行 SFT/RLCD，本机启动与集群提交 |
 | `data/` | 生成合成样例、筛选双编码器训练检查子集 |
 | `eval/` | 从通用实验快照绘制额外的详细图 |
+| `export/qwen/` | 合并完整权重、导出 ONNX/GGUF、校验和发布 |
 | `smoke/qwen/`、`smoke/dual_encoder/` | 各架构的训练与恢复集成检查 |
 
 <a id="installation"></a>
@@ -79,6 +80,30 @@ bash scripts/train/submit.sh smoke dual_encoder --output artifacts/dual_smoke_ru
 两种 smoke 都可以用 `--config` 和 `--output` 指定输入配置与独立输出目录。旧的 `submit_dual.sh`、`dual_entry.sh` 和 smoke 文件路径保留转发入口。
 
 八份基础配置覆盖 SFT/RLCD × 四种 stage，均使用合成数据和短程设置。正式训练需调整 `data`、`model_path`、`epochs`、`max_steps` 和 `output`。每次独立训练使用新的输出目录；初始化与恢复见[训练指南](../valen/training/README.md)。
+
+## ONNX 与 GGUF 导出
+
+先安装转换依赖并下载完整模型。以下命令导出 0.8B；默认同时导出并验证 ONNX 和 GGUF：
+
+```bash
+python -m pip install -e '.[model-formats]'
+hf download Valen-Team/Valen-0.8B --local-dir models/Valen-0.8B
+python scripts/export/qwen/export_formats.py --models Valen-0.8B
+```
+
+`--models-dir` 指定源模型父目录，`--output-dir` 指定转换结果父目录，两者默认均为仓库的 `models/`；`--work-dir` 默认是 `artifacts/model-format-export/`。也可选择 `--models Valen-2B Valen-4B`。脚本自动获取源模型的 commit、权重摘要和模型说明，核验本地权重后创建转换目录，并检查文本、图片、视频在 `question` 和 `shared_state` 模式下的输出一致性。使用 `--revision <commit>` 固定源版本，或通过 `--source-metadata <hub-revisions.json>` 复用已记录的版本。模型与转换产物均由 Git 忽略。
+
+转换目录包含 `FORMAT_USAGE.md` 和专用推理入口 `valen_formats.py`。ONNX 使用 ONNX Runtime 执行视觉主干、语言主干与 Mixer；GGUF 保留原始张量精度，使用自定义 `valen_qwen` 架构，需要附带的 Valen 推理入口。
+
+发布到自己的 Hugging Face 命名空间时，先登录，再执行发布脚本：
+
+```bash
+hf auth login
+python scripts/export/qwen/publish_formats.py \
+  --models Valen-0.8B --namespace YOUR_HF_NAMESPACE
+```
+
+`--exports-dir` 指定转换结果父目录，`--work-dir` 保存发布回执，`--formats ONNX` 或 `--formats GGUF` 可选择单个格式。发布脚本在上传前核验清单、文件摘要和源模型说明，上传后核对 Hub 上的文件大小及摘要；凭据使用 Hugging Face 登录缓存或 `HF_TOKEN`，不写入代码。两个入口也支持 `python -m scripts.export.qwen.export_formats` / `python -m scripts.export.qwen.publish_formats`。
 
 ## 命令参数
 
