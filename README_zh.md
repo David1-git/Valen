@@ -37,6 +37,8 @@ Valen（万澜）将视觉感知引入 System One 决策。受 [Jev](https://typ
 
 ## 📰 News
 
+- **2026-10-13**：发布 Valen 模型的 ONNX 和 GGUF 版本，可在 [Hugging Face](https://huggingface.co/Valen-Team) 下载。
+- **2026-10-13**：支持通过 API 调用 `valen-preview-0923`、`valen-0-8b`、`valen-2b` 和 `valen-4b`，使用示例见 [API 入门 Notebook](cookbook/api_quickstart_zh.ipynb)。
 - **2026-10-07**：**更快、更准、更通用。** 发布支持文本、图像和视频的最新多模态 System One 模型 **Valen（[0.8B](https://huggingface.co/Valen-Team/Valen-0.8B) / [2B](https://huggingface.co/Valen-Team/Valen-2B) / [4B](https://huggingface.co/Valen-Team/Valen-4B)）**，以及 [**VisualDecisionBench**](https://huggingface.co/datasets/Valen-Team/VisualDecisionBench) 评测基准。
 - **2026-09-30**：**Training&Inference Support:** 支持 Flash Attention 2 训练与推理、多机多卡训练，并提高训练时的 GPU 显存利用率。
 - **2026-09-23**：**Valen** 仓库开源，同时发布 [**Valen-preview-0923**](https://huggingface.co/Valen-Team/Valen-Preview-0923) 及其对应的[**训练数据**](https://huggingface.co/datasets/Valen-Team/Valen-Training-General-100k)。
@@ -205,3 +207,20 @@ python -m valen.train --config configs/train/qwen/sft_shared_state_full_joint.js
 代码使用 [Apache 2.0](LICENSE) 许可。基础模型和来源数据集遵循各自的许可。
 
 模型基于 [Qwen3.5](https://huggingface.co/Qwen/Qwen3.5-2B)，决策接口受 [TypeSafe Jev](https://typesafe.ai/blog/introducing-system-one-models-and-jev) 启发。
+
+<a id="引用"></a>
+
+## 📚 引用
+
+如果你在工作中使用 Valen，请引用本仓库：
+
+```bibtex
+@misc{valen,
+  author       = {{Valen Team}},
+  title        = {Valen},
+  howpublished = {GitHub - Liuziyu77/Valen: A multimodal System One decision model for text, images and video.},
+  note         = {GitHub repository},
+  year         = {2026},
+  url          = {https://github.com/Liuziyu77/Valen}
+}
+```

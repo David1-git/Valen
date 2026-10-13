@@ -37,6 +37,8 @@ Valen (万澜) brings visual perception to System One decision-making. Inspired 
 
 ## 📰 News
 
+- **2026-10-13**: Released ONNX and GGUF versions of Valen models, available on [Hugging Face](https://huggingface.co/Valen-Team).
+- **2026-10-13**: Added API access to `valen-preview-0923`, `valen-0-8b`, `valen-2b` and `valen-4b`. See the [API quick start notebook](cookbook/api_quickstart.ipynb) for usage examples.
 - **2026-10-07**: **Faster, more accurate, more versatile.** Released the latest multimodal System One model **Valen ([0.8B](https://huggingface.co/Valen-Team/Valen-0.8B), [2B](https://huggingface.co/Valen-Team/Valen-2B) and [4B](https://huggingface.co/Valen-Team/Valen-4B))**, supporting text, images and video, and the [**VisualDecisionBench**](https://huggingface.co/datasets/Valen-Team/VisualDecisionBench) benchmark.
 - **2026-09-30**: **Training&Inference Support:** Added Flash Attention 2 support, enabled training across multiple nodes and GPUs, and improved GPU memory utilization during training.
 - **2026-09-23**: Open-sourced the **Valen** repository and released [**Valen-preview-0923**](https://huggingface.co/Valen-Team/Valen-Preview-0923) with its corresponding [**training data**](https://huggingface.co/datasets/Valen-Team/Valen-Training-General-100k).
@@ -205,3 +207,20 @@ Scan the QR code below to join the Valen WeChat group, discuss the project and s
 The code is released under [Apache 2.0](LICENSE). Base models and source datasets retain their respective licenses.
 
 Built on [Qwen3.5](https://huggingface.co/Qwen/Qwen3.5-2B), with the decision interface inspired by [TypeSafe's Jev](https://typesafe.ai/blog/introducing-system-one-models-and-jev).
+
+<a id="citation"></a>
+
+## 📚 Citation
+
+If you use Valen in your work, please cite this repository:
+
+```bibtex
+@misc{valen,
+  author       = {{Valen Team}},
+  title        = {Valen},
+  howpublished = {GitHub - Liuziyu77/Valen: A multimodal System One decision model for text, images and video.},
+  note         = {GitHub repository},
+  year         = {2026},
+  url          = {https://github.com/Liuziyu77/Valen}
+}
+```
