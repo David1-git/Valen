@@ -162,7 +162,9 @@ python -m evaluation.visualdecisionbench.evaluate \
 
 添加 `--lora --revision lora-ckpt` 可评估旧 LoRA 模型。输出 `predictions.jsonl` 和 `metrics.json`，包含图像/视频、Choice/Noul/Score 分项与耗时。视频采样 16 帧；准确率仅统计硬标签题，软标签 Score 题参与概率指标计算。
 
-### 3. 训练
+### 3. Pre-training（预训练）
+
+从 Qwen3.5 基座出发，通过两阶段 SFT 构建 Valen 决策模型。
 
 共享 state 配方使用 Mixer。请安装 Flash Attention 2，或将 `model.attn_implementation` 设置为 `sdpa`。先在[配置](configs/train/qwen/)中设置数据路径、输出目录和训练预算；默认使用 smoke 数据，最多训练 100 步。
 
@@ -187,6 +189,27 @@ python -m valen.train --config configs/train/qwen/sft_shared_state_full_joint.js
 ```
 
 多卡使用 `VALEN_GPUS=8 bash scripts/train/launch.sh <config> [--initialize <checkpoint>]`。奖励设置与 checkpoint 恢复见[训练指南](valen/training/README.md)。
+
+### 4. Fine-tuning（微调）
+
+从已发布的完整 Valen 模型继续训练。下载模型后，选择 **LoRA** 或**全参数微调**：
+
+```bash
+hf download Valen-Team/Valen-2B --local-dir models/Valen-2B
+
+python -m valen.train --config configs/train/qwen/sft_finetune_lora.json
+# 或更新完整主干与 Mixer：
+python -m valen.train --config configs/train/qwen/sft_finetune_full.json
+```
+
+在所选配置中设置 `model.model_path`、`data.path` 和训练预算；示例使用小型纯文本 smoke 数据。自有文本、图片和视频数据遵循 [JSONL 格式](docs/data-format.md)。使用 0.8B 或 4B 时，下载对应仓库并修改 `model.model_path`。加载器保留已训练的主干和 Mixer，并继承发布模型的决策头结构、共享 state 模式和媒体设置；显式设置的决策头参数必须与模型一致。这两份配方使用 SDPA。
+
+发布权重通过 `model.model_path` 加载，并开始新的优化器和训练进度。`--initialize` 用于从本仓库的训练 checkpoint 开始新实验；`--resume` 用于恢复中断的任务，包括优化器状态和进度：
+
+```bash
+python -m valen.train --config configs/train/qwen/sft_finetune_lora.json \
+  --resume output/valen-finetune/lora/latest
+```
 
 <a id="参与贡献"></a>
 

@@ -15,7 +15,9 @@ class QwenBackend(ArchitectureBackend):
     def build_compiler(self, config, media_root):
         from transformers import AutoProcessor
         from valen.data.compilers.qwen import Compiler
-        return Compiler(AutoProcessor.from_pretrained(config["model_path"], local_files_only=True),
+        from .pretrained import published_config
+        return Compiler(AutoProcessor.from_pretrained(config["model_path"], local_files_only=True,
+                        trust_remote_code=published_config(config["model_path"]) is not None),
                         media_root, config.get("max_length", 8192), config.get("media_kwargs"),
                         execution=config.get("qwen_execution", "question"))
 

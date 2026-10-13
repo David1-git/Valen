@@ -12,10 +12,10 @@ class ValenQwen(nn.Module):
     model_name = MODEL_NAME
     architecture = "qwen"
 
-    def __init__(self, backbone, projection_dim=256, head_config=None):
+    def __init__(self, backbone, projection_dim=256, head_config=None, head=None):
         super().__init__()
         self.backbone = backbone
-        self.head = build_head(backbone.config.text_config.hidden_size,
+        self.head = head if head is not None else build_head(backbone.config.text_config.hidden_size,
                                dict({"projection_dim": projection_dim}, **(head_config or {})))
         self.backbone_autocast_dtype = None
 

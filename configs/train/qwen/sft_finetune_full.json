@@ -1,0 +1,33 @@
+{
+  "config_version": 2,
+  "model": {
+    "architecture": "qwen",
+    "model_path": "models/Valen-2B",
+    "finetuning_type": "full",
+    "dtype": "bf16",
+    "attn_implementation": "sdpa"
+  },
+  "data": {
+    "path": "data/smoke/text.jsonl",
+    "max_length": 8192
+  },
+  "training": {
+    "method": "sft",
+    "stage": "joint",
+    "output": "output/valen-finetune/full",
+    "device": "cuda",
+    "seed": 42,
+    "epochs": 1,
+    "max_steps": 100,
+    "tokens_per_step": 8192,
+    "microbatch_size": 1,
+    "microbatch_max_tokens": 8192,
+    "gradient_checkpointing": true,
+    "head_lr": 0.00001,
+    "language_lr": 0.000001,
+    "merger_lr": 0.000002,
+    "vision_lr": 0.0000005,
+    "save_every": 10
+  },
+  "objective": {"rps_weight": 0.2, "brier_weight": 0.1}
+}

@@ -13,7 +13,7 @@ CLI 在应用 `--method`、`--output` 之前展开配置，checkpoint 保存展�
 | 字段 | 默认值 | 含义 |
 | --- | --- | --- |
 | `architecture` | `"qwen"` | `qwen` 或 `dual_encoder`；下表中的 Qwen 参数只用于 Qwen 路径 |
-| `model_path` | 必填 | 本地 Qwen3.5 模型及处理器目录 |
+| `model_path` | 必填 | 本地 Qwen3.5 基座或已发布的完整 Valen 模型及处理器目录 |
 | `data` | 必填 | JSONL 文件路径；每卡读取完整文件后按记录分片 |
 | `output` | 必填 | 日志及 `latest/` checkpoint 的输出目录 |
 | `method` | `"sft"` | `sft` 或 `rlcd` |
@@ -22,7 +22,7 @@ CLI 在应用 `--method`、`--output` 之前展开配置，checkpoint 保存展�
 | `device` | `"cuda"` | 设备；多卡 CUDA 训练按 `LOCAL_RANK` 绑定 |
 | `dtype` | `"bf16"` | 主干计算精度，可选 `bf16`、`fp32`；full 联合训练以 FP32 保存参数，`bf16` 时使用 BF16 autocast；决策头保持 FP32 |
 | `attn_implementation` | `"eager"` | Qwen 注意力后端：`eager`、`sdpa`、`flash_attention_2` |
-| `qwen_execution` | `"question"` | Qwen 执行方式；`shared_state` 让同一记录各题共享一次前向；接受 `share_state` 别名 |
+| `qwen_execution` | `"question"`；完整 Valen 继承保存值 | Qwen 执行方式；`shared_state` 让同一记录各题共享一次前向；接受 `share_state` 别名 |
 | `seed` | `42` | 初始化、记录排序及采样使用的种子 |
 | `epochs` | `1` | 最大数据遍历轮数 |
 | `max_steps` | `2**63-1` | 最大批次数 |
@@ -41,6 +41,8 @@ CLI 在应用 `--method`、`--output` 之前展开配置，checkpoint 保存展�
 `max_length` 与 `tokens_per_step` 是两层限制。例如，一条记录有五个长度 2000 的分支：每个分支满足 `max_length=8192`，但总量为 10000，无法放入 `tokens_per_step=8000`。
 
 ## Qwen 共享 state 训练
+
+使用已发布的完整 Valen 权重时，加载器自动识别 `model_type="valen_qwen"`，保留主干和 Mixer 的原始权重。缺省的决策头结构、执行模式、`max_length` 和 `media_kwargs` 从模型的 `config.json` 继承；显式指定不兼容的决策头结构会在加载权重前报错。LoRA 和全参数微调配方见 [`sft_finetune_lora.json`](../configs/train/qwen/sft_finetune_lora.json) 与 [`sft_finetune_full.json`](../configs/train/qwen/sft_finetune_full.json)。两者从 `model_path` 开始新 SFT，`--initialize` 和 `--resume` 继续使用本仓库的 `checkpoint.pt` 格式。
 
 `qwen_execution="shared_state"` 使用一次 backbone 前向为同一记录的全部题目评分，
 单题也是同一实现的特例。`microbatch_size` 在此模式下是并行 state 数量上限；
