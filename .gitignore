@@ -1,5 +1,6 @@
 # Local environments and Python build/cache files
 .venv/
+.venv-api/
 .gpu-venv/
 __pycache__/
 *.py[cod]

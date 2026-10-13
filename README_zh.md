@@ -24,7 +24,7 @@
 
 <p align="center">
   <a href="README.md">English</a> · <b>简体中文</b><br>
-  <a href="#简介">简介</a> · <a href="#news">News</a> · <a href="#演示">演示</a> · <a href="#模型下载">模型与数据集</a> · <a href="#实验结果">评测结果</a> · <a href="#快速开始">快速开始</a>
+  <a href="#简介">简介</a> · <a href="#news">News</a> · <a href="#演示">演示</a> · <a href="#模型下载">模型与数据集</a> · <a href="#实验结果">评测结果</a> · <a href="#快速开始">快速开始</a> · <a href="cookbook/README_zh.md">Cookbook</a>
 </p>
 
 <a id="简介"></a>
@@ -116,6 +116,8 @@ Valen（万澜）将视觉感知引入 System One 决策。受 [Jev](https://typ
 <a id="快速开始"></a>
 
 ## 🚀 快速开始
+
+第一次使用 Valen？从 **[Cookbook](cookbook/README_zh.md)** 开始：[无需 GPU 调用 API](cookbook/api_zh.md)，或[下载模型，在本地运行文本、图片和视频推理](cookbook/local_inference_zh.md)。包含可直接运行的示例和常见报错处理。[English](cookbook/README.md)
 
 先按[安装说明](scripts/README.md#installation)准备依赖；Hugging Face 仓库需要访问权限时，先运行 `hf auth login`。
 

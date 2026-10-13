@@ -24,7 +24,7 @@
 
 <p align="center">
   <b>English</b> · <a href="README_zh.md">简体中文</a><br>
-  <a href="#introduction">Intro</a> · <a href="#news">News</a> · <a href="#demos">Demos</a> · <a href="#model-downloads">Models &amp; datasets</a> · <a href="#results">Eval results</a> · <a href="#quick-start">Quick start</a>
+  <a href="#introduction">Intro</a> · <a href="#news">News</a> · <a href="#demos">Demos</a> · <a href="#model-downloads">Models &amp; datasets</a> · <a href="#results">Eval results</a> · <a href="#quick-start">Quick start</a> · <a href="cookbook/README.md">Cookbook</a>
 </p>
 
 <a id="introduction"></a>
@@ -116,6 +116,8 @@ Earlier results remain in the [archived README](history/README_preview.md).
 <a id="quick-start"></a>
 
 ## 🚀 Quick start
+
+First time using Valen? Start with the **[Cookbook](cookbook/README.md)**: [call the API without a GPU](cookbook/api.md), or [download a model and run text, image and video inference locally](cookbook/local_inference.md). Runnable examples and troubleshooting are included. [简体中文](cookbook/README_zh.md)
 
 [Install the dependencies](scripts/README.md#installation). Run `hf auth login` if the Hugging Face repositories require access.
 
