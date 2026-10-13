@@ -114,7 +114,7 @@ Valen currently supports two training `method`s, `SFT` and `RLCD`. `stage` decid
   <img src="../assets/figures/readme-training-workflow.png" alt="Train with SFT first, optionally initialize RLCD from its checkpoint, then evaluate on a held-out test set." width="1000">
 </p>
 
-Both SFT and RLCD use labeled training data. Checkpoints from either method can be evaluated on a held-out test set, and loading them also requires the matching base model (the current implementation uses LoRA; full fine-tuning may be considered later).
+Both SFT and RLCD use labeled training data. Checkpoints from either method can be evaluated on a held-out test set, and loading them also requires the matching base model. Training uses LoRA by default (`finetuning_type="lora"`); with `"full"`, the `joint` stage updates all parameters of the language backbone, the vision backbone and the decision head. See [sft_shared_state_full_joint.json](../configs/train/qwen/sft_shared_state_full_joint.json) for an example.
 
 | Stage | Updated parameters | SFT | RLCD |
 | --- | --- | --- | --- |

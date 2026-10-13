@@ -55,7 +55,7 @@ Every question needs a lowercase `type` and a non-empty string `instructions`. T
 | `noul` | Not needed; if provided, it is not used to build candidates | `"true"`, `"false"` | Fixed, true first |
 | `score` | List of 2–10 non-empty grade descriptions | `"0"` to `"K-1"` | Keeps the list order, starting at 0 |
 
-Choice candidate names are also part of the input text; question IDs are not. Each Score branch only sees its own grade description, and the output value is computed from list indices, in the range `[0, K-1]`. If your application needs a 1–5 or 0–100 scale, convert on the caller side.
+Choice candidate names are also part of the input text; question IDs are not. In the default `question` mode, each Score branch only sees its own grade description; in `shared_state` mode, all grade descriptions appear in one sequence and every grade is scored in a single forward pass. In both modes the output value is computed from list indices, in the range `[0, K-1]`. If your application needs a 1–5 or 0–100 scale, convert on the caller side.
 
 ## Labels and missing values
 
@@ -63,11 +63,11 @@ Choice candidate names are also part of the input text; question IDs are not. Ea
 
 Any of the following marks a question as unlabeled: omitting its target, setting the target to `null`, omitting `probabilities`, or setting `probabilities` to `null`. If there are no labels at all, omit `targets` or use `{}`; do not set the whole `targets` to `null`.
 
-- Training and evaluation: unlabeled questions are skipped; if a record has no labels at all, its media is never read.
+- Training and evaluation: unlabeled questions do not count toward the loss or metrics. In `question` mode they are skipped; in `shared_state` mode they stay in the input sequence as context. If a record has no labels at all, its media is never read.
 - Inference: answers are returned for every question, labeled or not. Labels that are provided are still validated by the reader.
 - Soft labels: count toward distribution metrics such as cross-entropy, Brier and RPS, but not toward hard-label accuracy or the Noul confusion matrix.
 
-Extra label fields such as `label_source` and `votes` can record provenance; training does not read them. Training first averages question losses within each state and then averages over states, whereas evaluation aggregates per question, so the two use different denominators.
+Extra label fields such as `label_source` and `votes` can record provenance; training does not read them. By default (`loss_reduction="state_mean"`), training first averages question losses within each state and then averages over states; `question_mean` averages over all labeled questions directly. Evaluation aggregates per question, so its denominator differs from that of default training.
 
 ## Images and video
 

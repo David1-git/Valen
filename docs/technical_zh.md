@@ -114,7 +114,7 @@ JSONL 每行是一条记录。下例使用仓库里的[评测总览图](../asset
   <img src="../assets/figures/readme-training-workflow.png" alt="先用 SFT 训练，可选择从其 checkpoint 初始化 RLCD，再用独立测试集评估。" width="1000">
 </p>
 
-SFT 和 RLCD 均使用带标签的训练数据。两种方法的 checkpoint 都可在独立测试集上评估，加载时还需对应的base model（目前实现的是LoRA，后续可考虑全量微调）。
+SFT 和 RLCD 均使用带标签的训练数据。两种方法的 checkpoint 都可在独立测试集上评估，加载时还需对应的 base model。默认使用 LoRA（`finetuning_type="lora"`）；设为 `"full"` 时，`joint` 阶段全参数更新语言主干、视觉主干和决策头，示例见 [sft_shared_state_full_joint.json](../configs/train/qwen/sft_shared_state_full_joint.json)。
 
 | Stage | 更新参数 | SFT | RLCD |
 | --- | --- | --- | --- |

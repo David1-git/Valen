@@ -2,11 +2,11 @@
 
 [English](configuration.md) · **简体中文**
 
-`python -m valen.train --config <file.json>` 读取一个 JSON 对象。`--method` 和 `--output` 可覆盖对应字段，其他训练参数在 JSON 中修改。配置中的相对路径以**进程工作目录**为基准；以下命令均从仓库根目录执行。
+`python -m valen.train --config <file.json>` 读取一个 JSON 对象。`--method`、`--output` 和 `--attn-implementation` 可覆盖对应字段（最后一项覆盖 Qwen 的 `attn_implementation`），其他训练参数在 JSON 中修改。配置中的相对路径以**进程工作目录**为基准；以下命令均从仓库根目录执行。
 
-`configs/train/qwen/` 中的八份配置使用 Qwen3.5-2B 和合成数据集，运行 3 个 epoch、100 个 step，先达到的上限结束训练。配置按 `model`、`data`、`training`、`objective` 分区，`config_version` 为 2；`data.path` 是 JSONL 路径，其他字段沿用下表中的名称。
+`configs/train/qwen/` 下直属的 12 份配置均使用 Qwen3.5-2B 和合成数据集，`max_steps` 为 100。其中按 stage 划分的八份原有配置（`sft_*` 与 `rlcd_*` 的 `warmup`、`text`、`joint`、`vision_top`）运行 3 个 epoch，四份 `*_shared_state_*` 配置运行 1 个 epoch；先达到的上限结束训练。子目录 `valen1/` 是 Valen v1 正式训练的配置，见其 [README](../configs/train/qwen/valen1/README.md)。配置按 `model`、`data`、`training`、`objective` 分区，`config_version` 为 2；`data.path` 是 JSONL 路径，其他字段沿用下表中的名称。
 
-CLI 在应用 `--method`、`--output` 之前展开配置，checkpoint 保存展开后的字段。旧的平铺配置及原路径继续可用，同名字段出现相互冲突的值时直接报错。新旧配置归一化后相同，可以跨配置布局恢复同一次训练。双编码器的基座组合配置位于 `configs/train/dual_encoder/modernbert_dinov3b16/`。
+CLI 在应用 `--attn-implementation`、`--method`、`--output` 之前展开配置，checkpoint 保存展开后的字段。旧的平铺配置及原路径继续可用，同名字段出现相互冲突的值时直接报错。新旧配置归一化后相同，可以跨配置布局恢复同一次训练。双编码器的基座组合配置位于 `configs/train/dual_encoder/modernbert_dinov3b16/`。
 
 ## 数据、模型和训练budget
 
@@ -217,6 +217,6 @@ python -m valen.train --config output/experiment-configs/traffic-joint.json
 
 ## 配置校验与恢复
 
-恢复时会比较 checkpoint 内的配置与当前配置，包括数据文件摘要。只允许调整 `output`、`epochs`、`max_steps`、`device`、`save_every`；更换数据、stage、学习率或 RLCD 参数，应使用 `--initialize` 开始新实验。
+恢复时会比较 checkpoint 内的配置与当前配置，包括数据文件摘要。只允许调整 `output`、`epochs`、`max_steps`、`device`、`save_every`，以及运行设置 `microbatch_size`、`microbatch_max_tokens`、`data_prefetch`；Qwen 还允许切换 `attn_implementation` 和 `gradient_checkpointing`。运行设置的变化记录在 manifest 的 `resume_runtime_changes` 中。更换数据、stage、学习率或 RLCD 参数，应使用 `--initialize` 开始新实验。
 
 普通配置并没有统一的字段 schema，拼错的顶层字段不一定报错。`normalize_config` 会检查架构标识、训练目标和已移除的蒸馏选项：非零 `kd_weight` 或有效 `teacher_checkpoint` 会被拒绝；旧 checkpoint 中关闭的蒸馏字段会被清理。`rlcd` 子对象的字段则严格校验。实现分别见 [runner.py](../valen/training/runner.py)、[factory.py](../valen/modeling/factory.py) 和 [rlcd.py](../valen/training/rlcd.py)。

@@ -2,11 +2,11 @@
 
 **English** · [简体中文](configuration_zh.md)
 
-`python -m valen.train --config <file.json>` reads a single JSON object. `--method` and `--output` override the matching fields; all other training parameters are changed in the JSON. Relative paths in a config are resolved against the **process working directory**; all commands below run from the repository root.
+`python -m valen.train --config <file.json>` reads a single JSON object. `--method`, `--output` and `--attn-implementation` override the matching fields (the last one overrides Qwen's `attn_implementation`); all other training parameters are changed in the JSON. Relative paths in a config are resolved against the **process working directory**; all commands below run from the repository root.
 
-The eight configs in `configs/train/qwen/` use Qwen3.5-2B and the synthetic dataset, and train for 3 epochs or 100 steps, whichever limit is reached first. Configs are split into `model`, `data`, `training` and `objective` sections with `config_version` 2; `data.path` is the JSONL path, and all other fields keep the names in the tables below.
+All 12 configs directly under `configs/train/qwen/` use Qwen3.5-2B and the synthetic dataset, with `max_steps` set to 100. The eight original per-stage configs (`sft_*` and `rlcd_*` for `warmup`, `text`, `joint` and `vision_top`) run for 3 epochs, and the four `*_shared_state_*` configs for 1 epoch; training stops at whichever limit is reached first. The `valen1/` subdirectory holds the Valen v1 training configs; see its [README](../configs/train/qwen/valen1/README.md). Configs are split into `model`, `data`, `training` and `objective` sections with `config_version` 2; `data.path` is the JSONL path, and all other fields keep the names in the tables below.
 
-The CLI expands the config before applying `--method` and `--output`, and the checkpoint stores the expanded fields. The old flat config layout and its paths still work; if the same field appears with conflicting values, an error is raised. Old and new configs that normalize to the same result can resume the same training run across layouts. Dual-encoder backbone-combination configs are in `configs/train/dual_encoder/modernbert_dinov3b16/`.
+The CLI expands the config before applying `--attn-implementation`, `--method` and `--output`, and the checkpoint stores the expanded fields. The old flat config layout and its paths still work; if the same field appears with conflicting values, an error is raised. Old and new configs that normalize to the same result can resume the same training run across layouts. Dual-encoder backbone-combination configs are in `configs/train/dual_encoder/modernbert_dinov3b16/`.
 
 ## Data, model and training budget
 
@@ -185,6 +185,6 @@ Use a new output directory for each independent experiment. A regular new traini
 
 ## Config validation and resuming
 
-On resume, the config stored in the checkpoint is compared with the current config, including the data file digest. Only `output`, `epochs`, `max_steps`, `device` and `save_every` may change; to change the data, stage, learning rates or RLCD parameters, start a new experiment with `--initialize`.
+On resume, the config stored in the checkpoint is compared with the current config, including the data file digest. Only `output`, `epochs`, `max_steps`, `device` and `save_every` may change, plus the runtime settings `microbatch_size`, `microbatch_max_tokens` and `data_prefetch`; Qwen also allows switching `attn_implementation` and `gradient_checkpointing`. Changes to runtime settings are recorded in `resume_runtime_changes` in the manifest. To change the data, stage, learning rates or RLCD parameters, start a new experiment with `--initialize`.
 
 Regular configs have no unified field schema, so a misspelled top-level field does not necessarily raise an error. `normalize_config` checks the architecture identifier, the training objective and removed distillation options: a non-zero `kd_weight` or a valid `teacher_checkpoint` is rejected, and disabled distillation fields in old checkpoints are cleaned up. Fields in the `rlcd` sub-object are validated strictly. See [runner.py](../valen/training/runner.py), [factory.py](../valen/modeling/factory.py) and [rlcd.py](../valen/training/rlcd.py) for the implementations.
