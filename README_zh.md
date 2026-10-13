@@ -146,7 +146,7 @@ print(model.predict({
 }, execution="shared_state"))
 ```
 
-逐题推理使用 `execution="question"`；安装 Flash Attention 后可设置 `attn_implementation="flash_attention_2"`。图片和视频输入见[数据格式](docs/data-format.md)。
+逐题推理使用 `execution="question"`；安装 Flash Attention 后可设置 `attn_implementation="flash_attention_2"`。图片和视频输入见[数据格式](docs/data-format_zh.md)。
 
 ### 2. 评估 VisualDecisionBench
 

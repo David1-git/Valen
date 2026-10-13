@@ -94,7 +94,7 @@ VALEN_GPUS=4 bash scripts/train/launch.sh \
 
 `configs/train/` 中，SFT 和 RLCD 各有四份 stage 示例。`rlcd_*.json` 已设置 `method`、独立输出目录及完整 RLCD 参数。这些参数用于运行示例，尚未经过正式数据集调优。上述命令使用随仓库提供的 smoke 数据；正式训练前设置 `data`、轮数、步数和输出目录。`text` 仅使用纯文本；RLCD 的 `rps_weight` 必须为 0。
 
-`--initialize` 加载已有权重，开始新实验；`--resume` 恢复优化器、随机状态和进度。已达到 `epochs` 或 `max_steps` 的任务不会因恢复而自动追加训练，如需继续，应在配置副本中提高对应上限。更换 GPU 数时使用 `--initialize`。单机多卡脚本使用当前环境的 `python`，也可通过 `VALEN_PYTHON` 指定解释器。全部配置字段见[配置参考](../../docs/configuration.md)。
+`--initialize` 加载已有权重，开始新实验；`--resume` 恢复优化器、随机状态和进度。已达到 `epochs` 或 `max_steps` 的任务不会因恢复而自动追加训练，如需继续，应在配置副本中提高对应上限。更换 GPU 数时使用 `--initialize`。单机多卡脚本使用当前环境的 `python`，也可通过 `VALEN_PYTHON` 指定解释器。全部配置字段见[配置参考](../../docs/configuration_zh.md)。
 
 奖励与优化参数在配置的 `rlcd` 对象中调整。示例使用以下默认值，实际值会写入 checkpoint 配置。
 
@@ -127,7 +127,7 @@ RLCD 仅训练决策头时，可设置 `cache_frozen_features=true`：每批只�
 
 每轮记录排序后按 rank 分片，不补齐样本、不丢弃尾部。各卡分别按 `tokens_per_step` 打包完整 state，较早耗尽数据的 rank 继续参加梯度同步。所有 rank 都耗尽当前分片后进入下一轮。每次更新前的梯度已经按全局 state 数归一化，同步使用求和。
 
-`tokens_per_step` 是每卡的分支 token 总量上限，不是固定 batch size；它也不限制 RLCD 的重复前向次数。一个 state 超过预算时会直接报错。具体计数见[架构说明](../../docs/architecture.md#公共上下文与计算量)。
+`tokens_per_step` 是每卡的分支 token 总量上限，不是固定 batch size；它也不限制 RLCD 的重复前向次数。一个 state 超过预算时会直接报错。具体计数见[架构说明](../../docs/architecture_zh.md#公共上下文与计算量)。
 
 ## checkpoint 与恢复
 
@@ -162,7 +162,7 @@ latest/
 
 基础模型目录若有 `valen_manifest.json`，checkpoint 会保存它，并在加载时比较 revision 和权重字段。加载时不会重新读取全部基础权重计算摘要。加载器使用 `torch.load(..., weights_only=False)`。
 
-保存和恢复实现见 [checkpoint.py](checkpoint.py)，配置比较见 [runner.py](runner.py)。推理与评估共用同一加载器，详见[推理与评估](../../docs/evaluation.md)。
+保存和恢复实现见 [checkpoint.py](checkpoint.py)，配置比较见 [runner.py](runner.py)。推理与评估共用同一加载器，详见[推理与评估](../../docs/evaluation_zh.md)。
 
 ## 验证
 

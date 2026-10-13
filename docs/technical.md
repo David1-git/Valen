@@ -1,36 +1,36 @@
-# Valen 技术说明
+# Valen technical notes
 
-[English README](../README.md) · [中文 README](../README_zh.md)
+**English** · [简体中文](technical_zh.md) · [README](../README.md)
 
-本文收录模型架构、输出协议、训练流程和完整实验结果。所有命令均在仓库根目录执行。
+This page covers the model architecture, output protocol, training workflow and full experiment results. All commands run from the repository root.
 
-[输出类型](#输出类型) · [模型架构](#模型架构) · [环境要求](#环境要求) · [训练](#训练) · [完整实验](#完整实验) · [演示测量说明](#演示测量说明)
+[Output types](#output-types) · [Model architecture](#model-architecture) · [Requirements](#requirements) · [Training](#training) · [Full experiments](#full-experiments)
 
-## 输出类型
+## Output types
 
-| 类型 | 用途 | 返回内容 |
+| Type | Use | Returns |
 | --- | --- | --- |
-| **Choice** | 从 1–255 个候选中选择 | 所选候选、完整概率分布、confidence |
-| **Noul** | 判断条件是否成立 | `true` 的概率 |
-| **Score** | 按 2–10 个有序描述评分 | 等级编号期望值、等级概率、legend、confidence |
+| **Choice** | Pick one of 1–255 candidates | Chosen candidate, full probability distribution, confidence |
+| **Noul** | Decide whether a condition holds | Probability of `true` |
+| **Score** | Rate against 2–10 ordered descriptions | Expected grade index, grade probabilities, legend, confidence |
 
-候选随问题传入，不同任务和候选数量共用决策头。`confidence` 描述分布集中度。
+Candidates are passed in with each question, and all tasks and candidate counts share the same decision head. `confidence` describes how concentrated the distribution is.
 
-## 模型架构
+## Model architecture
 
 <p align="center">
-  <img src="../assets/figures/readme-architecture.png" alt="Valen 架构：多模态输入和候选经过 Qwen3.5 骨干、额外的共享决策头和 softmax，得到 Choice、Noul 或 Score 输出。" width="1000">
+  <img src="../assets/figures/readme-architecture.png" alt="Valen architecture: multimodal inputs and candidates pass through the Qwen3.5 backbone, an additional shared decision head and softmax to produce Choice, Noul or Score outputs." width="1000">
 </p>
 
-Choice 和 Noul 每道题用一个分支计算全部候选；Score 每个等级单独执行backbone forward pass，再将 logits 一起归一化。公共 state 只编码一次，但在backbone的每个分支中重复计算。详见[架构说明](../docs/architecture.md)和[响应字段与公式](../docs/evaluation.md)。
+Choice and Noul compute all candidates of a question in one branch; Score runs a separate backbone forward pass for each grade, then normalizes the logits together. The shared state is encoded only once but is recomputed in every backbone branch. See the [architecture notes](architecture.md) and the [response fields and formulas](evaluation.md).
 
-<a id="环境要求"></a>
+<a id="requirements"></a>
 
-## 环境要求
+## Requirements
 
-- Linux、Python 3.10+，NVIDIA GPU。
-- PyTorch 2.6.0、torchvision 0.21.0、Transformers 5.4.0、PEFT 0.18.1。
-- 完整依赖见 [pyproject.toml](../pyproject.toml)，安装脚本会自动安装。
+- Linux, Python 3.10+, NVIDIA GPU.
+- PyTorch 2.6.0, torchvision 0.21.0, Transformers 5.4.0, PEFT 0.18.1.
+- See [pyproject.toml](../pyproject.toml) for the full dependency list; the setup script installs everything automatically.
 
 ```bash
 git clone https://github.com/Liuziyu77/Valen.git Valen
@@ -39,39 +39,39 @@ bash scripts/setup/bootstrap.sh
 source .venv/bin/activate
 ```
 
-已有 Conda 或 virtualenv 环境时，参见[手动安装说明](../scripts/README.md#installation)。安装脚本创建 `.venv`，模型权重需要另行下载。
+If you already have a Conda or virtualenv environment, see the [manual installation guide](../scripts/README.md#installation). The setup script creates `.venv`; model weights must be downloaded separately.
 
-## 本地训练与功能检查
+## Local training and smoke checks
 
-先按[环境要求](#环境要求)安装依赖。依赖安装完成后，需下载模型权重。
+Install the dependencies as described in [Requirements](#requirements) first, then download the model weights.
 
 ```bash
-# 下载 Qwen3.5-2B Base 模型。
+# Download the Qwen3.5-2B base model.
 hf download Qwen/Qwen3.5-2B --local-dir models/Qwen3.5-2B
 
-# 用随仓库提供的合成样本训练决策头。
+# Train the decision head on the synthetic samples shipped with the repository.
 python -m valen.train \
   --config configs/train/qwen/sft_warmup.json
 
-# 加载训练得到的 checkpoint 进行推理。
+# Run inference with the resulting checkpoint.
 python -m valen.inference \
   --checkpoint output/sft_warmup/latest \
   --data data/smoke/train.jsonl \
   --output output/sft_warmup/predictions.jsonl
 
-# 用同一组合成样本检查评估流程。
+# Check the evaluation pipeline on the same synthetic samples.
 python -m valen.evaluate \
   --checkpoint output/sft_warmup/latest \
   --data data/smoke/train.jsonl \
   --output output/sft_warmup/smoke_eval
 ```
 
-`data/smoke` 有少量简单题目，仅仅用于测试功能是否正常运行。
+`data/smoke` contains a handful of simple questions and is only meant to check that everything runs.
 
 <details>
-<summary>一条带图片输入的标注记录</summary>
+<summary>A labeled record with an image input</summary>
 
-JSONL 每行是一条记录。下例使用仓库里的[评测总览图](../assets/figures/evaluation-results.png)，假设保存为仓库根目录的 `example.jsonl`。
+Each line of a JSONL file is one record. The example below uses the repository's [evaluation overview figure](../assets/figures/evaluation-results.png) and assumes it is saved as `example.jsonl` at the repository root.
 
 ```json
 {
@@ -81,7 +81,7 @@ JSONL 每行是一条记录。下例使用仓库里的[评测总览图](../asset
       "messages": [{
         "role": "user",
         "content": [
-          {"type": "text", "text": "比较图中 General 任务上 2B 模型的准确率和平均单题耗时。"},
+          {"type": "text", "text": "Compare the accuracy and average per-question latency of the 2B models on the General task in the figure."},
           {"type": "image_url", "image_url": {"url": "assets/figures/evaluation-results.png"}}
         ]
       }]
@@ -89,7 +89,7 @@ JSONL 每行是一条记录。下例使用仓库里的[评测总览图](../asset
     "questions": {
       "best_2b": {
         "type": "choice",
-        "instructions": "在 General 任务上，平均单题耗时低于 200 ms 的 2B 模型中，哪个准确率最高？",
+        "instructions": "On the General task, which 2B model with an average per-question latency below 200 ms has the highest accuracy?",
         "criteria": {
           "qwen": "Qwen3.5-2B",
           "valen": "Valen-Preview-0923"
@@ -104,51 +104,51 @@ JSONL 每行是一条记录。下例使用仓库里的[评测总览图](../asset
 ```
 </details>
 
-<a id="训练"></a>
+<a id="training"></a>
 
-## 训练
+## Training
 
-当前 Valen 支持 `SFT` 和 `RLCD` 两种训练 `method`，`stage` 决定更新哪些参数，当前支持四种 stage 配置。
+Valen currently supports two training `method`s, `SFT` and `RLCD`. `stage` decides which parameters are updated, and four stage configurations are currently supported.
 
 <p align="center">
-  <img src="../assets/figures/readme-training-workflow.png" alt="先用 SFT 训练，可选择从其 checkpoint 初始化 RLCD，再用独立测试集评估。" width="1000">
+  <img src="../assets/figures/readme-training-workflow.png" alt="Train with SFT first, optionally initialize RLCD from its checkpoint, then evaluate on a held-out test set." width="1000">
 </p>
 
-SFT 和 RLCD 均使用带标签的训练数据。两种方法的 checkpoint 都可在独立测试集上评估，加载时还需对应的base model（目前实现的是LoRA，后续可考虑全量微调）。
+Both SFT and RLCD use labeled training data. Checkpoints from either method can be evaluated on a held-out test set, and loading them also requires the matching base model (the current implementation uses LoRA; full fine-tuning may be considered later).
 
-| Stage | 更新参数 | SFT | RLCD |
+| Stage | Updated parameters | SFT | RLCD |
 | --- | --- | --- | --- |
-| `warmup` | 决策头 | [配置](../configs/train/qwen/sft_warmup.json) | [配置](../configs/train/qwen/rlcd_warmup.json) |
-| `text` | LLM LoRA、决策头；使用纯文本数据 | [配置](../configs/train/qwen/sft_text.json) | [配置](../configs/train/qwen/rlcd_text.json) |
-| `joint` | LLM LoRA、VIT merger、决策头 | [配置](../configs/train/qwen/sft_joint.json) | [配置](../configs/train/qwen/rlcd_joint.json) |
-| `vision_top` | `joint` 加视觉编码器最后 4 层 | [配置](../configs/train/qwen/sft_vision_top.json) | [配置](../configs/train/qwen/rlcd_vision_top.json) |
+| `warmup` | Decision head | [config](../configs/train/qwen/sft_warmup.json) | [config](../configs/train/qwen/rlcd_warmup.json) |
+| `text` | LLM LoRA, decision head; uses text-only data | [config](../configs/train/qwen/sft_text.json) | [config](../configs/train/qwen/rlcd_text.json) |
+| `joint` | LLM LoRA, ViT merger, decision head | [config](../configs/train/qwen/sft_joint.json) | [config](../configs/train/qwen/rlcd_joint.json) |
+| `vision_top` | `joint` plus the last 4 layers of the vision encoder | [config](../configs/train/qwen/sft_vision_top.json) | [config](../configs/train/qwen/rlcd_vision_top.json) |
 
-正式训练前复制一份配置，设置 `model_path`、`data`、`output`、`epochs` 和 `max_steps`。`tokens_per_step` 是**每张 GPU** 的预算，按 state 内全部问题分支的 token 总量计算。每卡持有完整模型，采用**数据并行**。默认值与修改示例见[配置参考](../docs/configuration.md)。
+Before real training, copy a config and set `model_path`, `data`, `output`, `epochs` and `max_steps`. `tokens_per_step` is a **per-GPU** budget, counted as the total tokens of all question branches in a state. Every GPU holds the full model, using **data parallelism**. See the [configuration reference](configuration.md) for the defaults and examples of changing them.
 
 ```bash
-# 单机八卡；每次独立实验使用新的输出目录。
+# Single node, eight GPUs; use a new output directory for each independent experiment.
 VALEN_GPUS=8 bash scripts/train/launch.sh configs/train/qwen/sft_warmup.json
 
-# RLCD 从已训练的 SFT 决策头 checkpoint 初始化。
+# Initialize RLCD from a trained SFT decision-head checkpoint.
 VALEN_GPUS=8 bash scripts/train/launch.sh configs/train/qwen/rlcd_warmup.json \
   --initialize output/sft_warmup/latest
 ```
 
-目前 SFT 使用标签监督；RLCD 使用 GRPO 形式，奖励同时考虑正确性和置信度误差，另加固定参考策略的 KL 约束和可选的 Brier 损失。公式、初始化和断点恢复命令见[训练说明](../valen/training/README.md)。
+SFT currently uses label supervision. RLCD takes a GRPO-style form whose reward accounts for both correctness and confidence error, with a KL constraint toward a fixed reference policy and an optional Brier loss. See the [training guide](../valen/training/README.md) for the formulas, initialization and resume commands.
 
-checkpoint 将可训练参数的值和训练状态保存在 `<output>/latest/`，冻结的base模型另行加载。每次保存会覆盖 `latest/`，不保留历史版本。`--initialize` 从已有权重开始新实验；`--resume` 恢复优化器、数据游标和各 rank 状态，要求进程数不变。`launch.sh` 共用于 SFT 和 RLCD，可通过 `VALEN_PYTHON` 指定解释器。
+A checkpoint saves the values of the trainable parameters and the training state under `<output>/latest/`; the frozen base model is loaded separately. Each save overwrites `latest/` and keeps no earlier versions. `--initialize` starts a new experiment from existing weights; `--resume` restores the optimizer, data cursor and per-rank state, and requires the same number of processes. `launch.sh` serves both SFT and RLCD, and `VALEN_PYTHON` selects the interpreter.
 
-<a id="完整实验"></a>
+<a id="full-experiments"></a>
 
-## 完整实验
+## Full experiments
 
-表中的 `Valen-Base-*` 为通用任务模型，`Valen-Sokoban-*` 为推箱子任务模型；RLCD 为本仓库的强化学习训练方法。两组实验使用各自任务训练后的 checkpoint。
+In the tables, `Valen-Base-*` are general-task models and `Valen-Sokoban-*` are Sokoban models; RLCD is this repository's reinforcement-learning training method. Each group of experiments uses checkpoints trained on its own task.
 
 ### Model Card
 
-我们对模型的训练方法，训练数据进行了消融实验：
+We ran ablations over the training method and the training data:
 
-| 模型 | 训练方法 | 数据 | 数据集 |
+| Model | Training method | Data | Dataset |
 | --- | --- | --- | --- |
 | Valen-Base-SFT-0.8B | SFT | General SFT 100k | [![General 100k](https://img.shields.io/badge/General-100k-2185B5?style=flat&logo=huggingface&logoColor=FFD21E&labelColor=555555)](https://huggingface.co/datasets/Valen-Team/Valen-Training-General-100k) |
 | Valen-Base-SFT-2B | SFT | General SFT 100k | [![General 100k](https://img.shields.io/badge/General-100k-2185B5?style=flat&logo=huggingface&logoColor=FFD21E&labelColor=555555)](https://huggingface.co/datasets/Valen-Team/Valen-Training-General-100k) |
@@ -157,16 +157,16 @@ checkpoint 将可训练参数的值和训练状态保存在 `<output>/latest/`�
 | Valen-Sokoban-SFT-2B | SFT + SFT | General SFT 100k + Sokoban SFT 30k | [![General 100k](https://img.shields.io/badge/General-100k-2185B5?style=flat&logo=huggingface&logoColor=FFD21E&labelColor=555555)](https://huggingface.co/datasets/Valen-Team/Valen-Training-General-100k)&nbsp;[![Sokoban](https://img.shields.io/badge/Sokoban-8A63B8?style=flat&logo=huggingface&logoColor=FFD21E)](https://huggingface.co/datasets/Valen-Team/Valen-Eval-Game) |
 | Valen-Sokoban-RLCD-2B | SFT + RLCD | General SFT 100k + Sokoban RLCD 30k | [![General 100k](https://img.shields.io/badge/General-100k-2185B5?style=flat&logo=huggingface&logoColor=FFD21E&labelColor=555555)](https://huggingface.co/datasets/Valen-Team/Valen-Training-General-100k)&nbsp;[![Sokoban](https://img.shields.io/badge/Sokoban-8A63B8?style=flat&logo=huggingface&logoColor=FFD21E)](https://huggingface.co/datasets/Valen-Team/Valen-Eval-Game) |
 
-Sokoban 的训练集和评测集均包含在 [Valen-Eval-Game](https://huggingface.co/datasets/Valen-Team/Valen-Eval-Game) 中，训练与评测分别使用对应划分。
+The Sokoban training and evaluation sets are both included in [Valen-Eval-Game](https://huggingface.co/datasets/Valen-Team/Valen-Eval-Game); training and evaluation each use their own split.
 
 #### Training Loss
 
 <p align="center">
-  <a href="../assets/figures/training/sft100k_loss.png"><img src="../assets/figures/training/sft100k_loss.png" alt="Valen-Base-SFT-0.8B 和 2B 在 General 100k 数据上的训练损失曲线。" width="1000"></a><br>
-  <sub>General SFT：0.8B 与 2B 的训练 loss。</sub>
+  <a href="../assets/figures/training/sft100k_loss.png"><img src="../assets/figures/training/sft100k_loss.png" alt="Training loss curves of Valen-Base-SFT-0.8B and 2B on the General 100k data." width="1000"></a><br>
+  <sub>General SFT: training loss of 0.8B and 2B.</sub>
 </p>
 
 <p align="center">
-  <a href="../assets/figures/training/sokoban_rlcd_loss_reward.png"><img src="../assets/figures/training/sokoban_rlcd_loss_reward.png" alt="Valen-Sokoban-RLCD 的 0.8B 和 2B 模型在训练过程中的 loss 与平均 reward。" width="1000"></a><br>
-  <sub>Sokoban RLCD：0.8B 与 2B 的训练 loss 和 reward。</sub>
+  <a href="../assets/figures/training/sokoban_rlcd_loss_reward.png"><img src="../assets/figures/training/sokoban_rlcd_loss_reward.png" alt="Loss and mean reward of the Valen-Sokoban-RLCD 0.8B and 2B models during training." width="1000"></a><br>
+  <sub>Sokoban RLCD: training loss and reward of 0.8B and 2B.</sub>
 </p>
