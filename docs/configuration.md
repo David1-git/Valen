@@ -4,7 +4,7 @@
 
 `python -m valen.train --config <file.json>` reads a single JSON object. `--method`, `--output` and `--attn-implementation` override the matching fields (the last one overrides Qwen's `attn_implementation`); all other training parameters are changed in the JSON. Relative paths in a config are resolved against the **process working directory**; all commands below run from the repository root.
 
-All 12 configs directly under `configs/train/qwen/` use Qwen3.5-2B and the synthetic dataset, with `max_steps` set to 100. The eight original per-stage configs (`sft_*` and `rlcd_*` for `warmup`, `text`, `joint` and `vision_top`) run for 3 epochs, and the four `*_shared_state_*` configs for 1 epoch; training stops at whichever limit is reached first. The `valen1/` subdirectory holds the Valen v1 training configs; see its [README](../configs/train/qwen/valen1/README.md). Configs are split into `model`, `data`, `training` and `objective` sections with `config_version` 2; `data.path` is the JSONL path, and all other fields keep the names in the tables below.
+The 12 Qwen-base example configs directly under `configs/train/qwen/` use Qwen3.5-2B and the synthetic dataset, with `max_steps` set to 100. The eight original per-stage configs (`sft_*` and `rlcd_*` for `warmup`, `text`, `joint` and `vision_top`) run for 3 epochs, and the four `*_shared_state_*` configs for 1 epoch; training stops at whichever limit is reached first. The two `sft_finetune_*` configs use a released complete Valen-2B model and the text smoke dataset, with 1 epoch and a 100-step limit. The `valen1/` subdirectory holds the Valen v1 training configs; see its [README](../configs/train/qwen/valen1/README.md). Configs are split into `model`, `data`, `training` and `objective` sections with `config_version` 2; `data.path` is the JSONL path, and all other fields keep the names in the tables below.
 
 The CLI expands the config before applying `--attn-implementation`, `--method` and `--output`, and the checkpoint stores the expanded fields. The old flat config layout and its paths still work; if the same field appears with conflicting values, an error is raised. Old and new configs that normalize to the same result can resume the same training run across layouts. Dual-encoder backbone-combination configs are in `configs/train/dual_encoder/modernbert_dinov3b16/`.
 
@@ -15,7 +15,7 @@ The defaults below are the values the source code uses when a field is omitted; 
 | Field | Default | Meaning |
 | --- | --- | --- |
 | `architecture` | `"qwen"` | `qwen` or `dual_encoder`; the Qwen parameters in this table apply to the Qwen path only |
-| `model_path` | required | Local Qwen3.5 model and processor directory |
+| `model_path` | required | Local Qwen3.5 base or released complete Valen model and processor directory |
 | `data` | required | JSONL file path; each GPU reads the whole file, then shards it by record |
 | `output` | required | Output directory for logs and the `latest/` checkpoint |
 | `method` | `"sft"` | `sft` or `rlcd` |
@@ -24,18 +24,18 @@ The defaults below are the values the source code uses when a field is omitted; 
 | `device` | `"cuda"` | Device; multi-GPU CUDA training binds devices by `LOCAL_RANK` |
 | `dtype` | `"bf16"` | Backbone compute precision, `bf16` or `fp32`; full joint training keeps parameters in FP32 and uses BF16 autocast with `bf16`; the decision head stays in FP32 |
 | `attn_implementation` | `"eager"` | Qwen attention backend: `eager`, `sdpa`, `flash_attention_2` |
-| `qwen_execution` | `"question"` | Qwen execution mode; `shared_state` lets all questions in a record share one forward pass; the alias `share_state` is accepted |
+| `qwen_execution` | `"question"`; complete Valen inherits its saved value | Qwen execution mode; `shared_state` lets all questions in a record share one forward pass; the alias `share_state` is accepted |
 | `seed` | `42` | Seed for initialization, record ordering and sampling |
 | `epochs` | `1` | Maximum number of passes over the data |
 | `max_steps` | `2**63-1` | Maximum number of batches |
-| `max_length` | `8192` | Token limit for a single complete branch; exceeding it raises an error |
+| `max_length` | `8192`; complete Valen inherits its saved value | Token limit for a single complete branch; exceeding it raises an error |
 | `tokens_per_step` | `16384` | Per-rank, per-batch limit on `compute_tokens`; must be positive |
 | `microbatch_size` | `1` | Number of QAs per parallel Qwen forward/backward; in shared_state mode, the number of states; supports SFT and RLCD |
 | `microbatch_max_tokens` | `32768` | Limit on the total padded tokens of each backbone forward |
 | `data_prefetch` | `false` | Qwen SFT or shared_state RLCD preprocesses the next batch on the CPU while the GPU computes the current one |
 | `sft_iterations` | `1` | Number of optimization passes over the same SFT batch, a positive integer; can be matched to RLCD's `num_iterations` for controlled comparisons |
 | `loss_reduction` | `"state_mean"` | Average over questions within each state, then over states; `question_mean` averages over all labeled QAs |
-| `media_kwargs` | `{}` | Arguments passed to the official processor; saved with the checkpoint |
+| `media_kwargs` | `{}`; complete Valen inherits its saved value | Arguments passed to the official processor; saved with the checkpoint |
 | `save_every` | `100` | Overwrite `latest/` every this many batches; should be a positive integer; a checkpoint is also saved on normal completion |
 
 `tokens_per_step` controls how many complete states are accumulated per update. All branches of all labeled questions in a state must fit into the budget together; a single state that exceeds it raises an error and is never split or truncated.
@@ -43,6 +43,8 @@ The defaults below are the values the source code uses when a field is omitted; 
 `max_length` and `tokens_per_step` are two separate limits. For example, a record with five branches of 2000 tokens each satisfies `max_length=8192` for every branch, but its 10000-token total does not fit into `tokens_per_step=8000`.
 
 ## Qwen shared-state training
+
+When using released complete Valen weights, the loader detects `model_type="valen_qwen"` and retains the trained backbone and Mixer. Omitted head architecture, execution mode, `max_length` and `media_kwargs` settings are inherited from the model's `config.json`; explicitly incompatible head settings raise an error before weights are loaded. See [`sft_finetune_lora.json`](../configs/train/qwen/sft_finetune_lora.json) and [`sft_finetune_full.json`](../configs/train/qwen/sft_finetune_full.json) for LoRA and full fine-tuning recipes. Both start a new SFT run from `model_path`; `--initialize` and `--resume` continue to use this repository's `checkpoint.pt` format.
 
 `qwen_execution="shared_state"` scores all questions of a record with one backbone forward pass; a single question is a special case of the same implementation. In this mode `microbatch_size` caps the number of parallel states, and the image/video inputs of a state are not repeated per question. `loss_reduction="question_mean"` preserves a data mixture specified by QA counts when records hold different numbers of questions. The mode and loss reduction are saved with the checkpoint; changing either requires starting a new experiment with `--initialize`.
 

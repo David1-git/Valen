@@ -4,7 +4,7 @@
 
 `python -m valen.train --config <file.json>` 读取一个 JSON 对象。`--method`、`--output` 和 `--attn-implementation` 可覆盖对应字段（最后一项覆盖 Qwen 的 `attn_implementation`），其他训练参数在 JSON 中修改。配置中的相对路径以**进程工作目录**为基准；以下命令均从仓库根目录执行。
 
-`configs/train/qwen/` 下直属的 12 份配置均使用 Qwen3.5-2B 和合成数据集，`max_steps` 为 100。其中按 stage 划分的八份原有配置（`sft_*` 与 `rlcd_*` 的 `warmup`、`text`、`joint`、`vision_top`）运行 3 个 epoch，四份 `*_shared_state_*` 配置运行 1 个 epoch；先达到的上限结束训练。子目录 `valen1/` 是 Valen v1 正式训练的配置，见其 [README](../configs/train/qwen/valen1/README.md)。配置按 `model`、`data`、`training`、`objective` 分区，`config_version` 为 2；`data.path` 是 JSONL 路径，其他字段沿用下表中的名称。
+`configs/train/qwen/` 下直属的 12 份 Qwen 基座示例配置使用 Qwen3.5-2B 和合成数据集，`max_steps` 为 100。其中按 stage 划分的八份原有配置（`sft_*` 与 `rlcd_*` 的 `warmup`、`text`、`joint`、`vision_top`）运行 3 个 epoch，四份 `*_shared_state_*` 配置运行 1 个 epoch；先达到的上限结束训练。另有两份 `sft_finetune_*` 配置使用已发布的完整 Valen-2B 和纯文本 smoke 数据，运行 1 个 epoch，最多 100 步。子目录 `valen1/` 是 Valen v1 正式训练的配置，见其 [README](../configs/train/qwen/valen1/README.md)。配置按 `model`、`data`、`training`、`objective` 分区，`config_version` 为 2；`data.path` 是 JSONL 路径，其他字段沿用下表中的名称。
 
 CLI 在应用 `--attn-implementation`、`--method`、`--output` 之前展开配置，checkpoint 保存展开后的字段。旧的平铺配置及原路径继续可用，同名字段出现相互冲突的值时直接报错。新旧配置归一化后相同，可以跨配置布局恢复同一次训练。双编码器的基座组合配置位于 `configs/train/dual_encoder/modernbert_dinov3b16/`。
 
@@ -15,7 +15,7 @@ CLI 在应用 `--attn-implementation`、`--method`、`--output` 之前展开配�
 | 字段 | 默认值 | 含义 |
 | --- | --- | --- |
 | `architecture` | `"qwen"` | `qwen` 或 `dual_encoder`；下表中的 Qwen 参数只用于 Qwen 路径 |
-| `model_path` | 必填 | 本地 Qwen3.5 模型及处理器目录 |
+| `model_path` | 必填 | 本地 Qwen3.5 基座或已发布的完整 Valen 模型及处理器目录 |
 | `data` | 必填 | JSONL 文件路径；每卡读取完整文件后按记录分片 |
 | `output` | 必填 | 日志及 `latest/` checkpoint 的输出目录 |
 | `method` | `"sft"` | `sft` 或 `rlcd` |
@@ -24,18 +24,18 @@ CLI 在应用 `--attn-implementation`、`--method`、`--output` 之前展开配�
 | `device` | `"cuda"` | 设备；多卡 CUDA 训练按 `LOCAL_RANK` 绑定 |
 | `dtype` | `"bf16"` | 主干计算精度，可选 `bf16`、`fp32`；full 联合训练以 FP32 保存参数，`bf16` 时使用 BF16 autocast；决策头保持 FP32 |
 | `attn_implementation` | `"eager"` | Qwen 注意力后端：`eager`、`sdpa`、`flash_attention_2` |
-| `qwen_execution` | `"question"` | Qwen 执行方式；`shared_state` 让同一记录各题共享一次前向；接受 `share_state` 别名 |
+| `qwen_execution` | `"question"`；完整 Valen 继承保存值 | Qwen 执行方式；`shared_state` 让同一记录各题共享一次前向；接受 `share_state` 别名 |
 | `seed` | `42` | 初始化、记录排序及采样使用的种子 |
 | `epochs` | `1` | 最大数据遍历轮数 |
 | `max_steps` | `2**63-1` | 最大批次数 |
-| `max_length` | `8192` | 单个完整分支的 token 上限，超限报错 |
+| `max_length` | `8192`；完整 Valen 继承保存值 | 单个完整分支的 token 上限，超限报错 |
 | `tokens_per_step` | `16384` | 每 rank 每批的 `compute_tokens` 上限，必须为正 |
 | `microbatch_size` | `1` | Qwen 每次并行前向/反向的 QA 数量；shared_state 模式下为 state 数量，支持 SFT 和 RLCD |
 | `microbatch_max_tokens` | `32768` | 每次 backbone 前向的补齐后 token 总量上限 |
 | `data_prefetch` | `false` | Qwen SFT 或 shared_state RLCD 在 CPU 上预处理下一批，同时执行当前批的 GPU 计算 |
 | `sft_iterations` | `1` | 同一 SFT 批次的优化次数，正整数；可与 RLCD 的 `num_iterations` 对齐进行实验对照 |
 | `loss_reduction` | `"state_mean"` | 先对 state 内各题平均，再对 state 平均；`question_mean` 按全部有标签 QA 平均 |
-| `media_kwargs` | `{}` | 传给官方处理器的参数；随 checkpoint 保存 |
+| `media_kwargs` | `{}`；完整 Valen 继承保存值 | 传给官方处理器的参数；随 checkpoint 保存 |
 | `save_every` | `100` | 每隔多少批覆盖保存 `latest/`；应设为正整数，正常结束也会保存 |
 
 `tokens_per_step` 控制每次更新累积多少个完整 state。state 内所有有标签题目的全部分支要一起放入预算；单个 state 超限时直接报错，不会拆分或截断。
@@ -43,6 +43,8 @@ CLI 在应用 `--attn-implementation`、`--method`、`--output` 之前展开配�
 `max_length` 与 `tokens_per_step` 是两层限制。例如，一条记录有五个长度 2000 的分支：每个分支满足 `max_length=8192`，但总量为 10000，无法放入 `tokens_per_step=8000`。
 
 ## Qwen 共享 state 训练
+
+使用已发布的完整 Valen 权重时，加载器自动识别 `model_type="valen_qwen"`，保留主干和 Mixer 的原始权重。缺省的决策头结构、执行模式、`max_length` 和 `media_kwargs` 从模型的 `config.json` 继承；显式指定不兼容的决策头结构会在加载权重前报错。LoRA 和全参数微调配方见 [`sft_finetune_lora.json`](../configs/train/qwen/sft_finetune_lora.json) 与 [`sft_finetune_full.json`](../configs/train/qwen/sft_finetune_full.json)。两者从 `model_path` 开始新 SFT，`--initialize` 和 `--resume` 继续使用本仓库的 `checkpoint.pt` 格式。
 
 `qwen_execution="shared_state"` 使用一次 backbone 前向为同一记录的全部题目评分，
 单题也是同一实现的特例。`microbatch_size` 在此模式下是并行 state 数量上限；

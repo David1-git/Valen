@@ -22,6 +22,8 @@ def normalize_model_config(config):
     config = flatten_config(config)
     get_backend(config.setdefault("architecture", "qwen"))
     if config["architecture"] == "qwen":
+        from .qwen.pretrained import with_published_settings
+        config = with_published_settings(config)
         finetuning = config.setdefault("finetuning_type", "lora")
         if finetuning not in ("lora", "full"):
             raise ValueError("finetuning_type must be lora or full")

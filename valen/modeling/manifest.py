@@ -14,6 +14,14 @@ def read_base_manifest(model_path):
     candidates = []
     for path in root.glob("*_manifest.json"):
         value = json.loads(path.read_text(encoding="utf-8"))
+        # 发布模型以训练权重摘要标识来源。 / Identify released models by their exported tensors.
+        if isinstance(value, dict) and str(value.get("format", "")).startswith("valen_qwen_"):
+            weights = {name: digest for name, digest in value.get("files_sha256", {}).items()
+                       if name.endswith(".safetensors")}
+            if weights and value.get("source_checkpoint_sha256"):
+                candidates.append({"revision": "sha256:" + value["source_checkpoint_sha256"],
+                                   "weight_sha256": weights})
+                continue
         if isinstance(value, dict) and isinstance(value.get("revision"), str) and isinstance(value.get("weight_sha256"), dict):
             candidates.append(value)
     if len(candidates) > 1:

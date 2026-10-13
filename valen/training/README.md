@@ -69,6 +69,14 @@ Brier 辅助项默认开启，设 `brier_weight=0` 可关闭该辅助项。
 
 ## 运行
 
+### Fine-tuning released Valen models / 微调已发布模型
+
+Download a complete Valen repository to a local directory, then set `model.model_path` in [`sft_finetune_lora.json`](../../configs/train/qwen/sft_finetune_lora.json) or [`sft_finetune_full.json`](../../configs/train/qwen/sft_finetune_full.json). The loader preserves the trained backbone and Mixer, inherits missing architecture/media settings, and rejects incompatible head settings. Set `data.path` to your [JSONL dataset](../../docs/data-format.md). A new SFT run starts from these weights with a fresh optimizer; `--resume` restores the native checkpoint produced by that run. Published HF model folders are loaded through `model_path`.
+
+下载完整 Valen 模型后，在上述配方中指定本地 `model_path`、[自有数据](../../docs/data-format_zh.md)和训练预算即可继续微调，已训练的 Mixer 会保留。`full` 更新完整主干和决策头，`lora` 更新语言 LoRA、视觉 merger 和决策头。发布模型的参数存储精度保留，`dtype` 控制主干的计算精度。`--initialize` 与 `--resume` 使用本仓库训练得到的 `checkpoint.pt`；HF 导出目录不包含原训练的优化器和数据进度。
+
+### Pre-training from Qwen / 从 Qwen 构建 Valen
+
 Qwen 默认使用 `finetuning_type="lora"`。设置 `finetuning_type="full"` 时，`warmup` 仍只训练决策头，`joint` 更新整个语言主干、视觉主干和决策头；学习率分别由 `language_lr`、`vision_lr`、`merger_lr` 和 `head_lr` 控制。全参数联合训练保留 FP32 参数及优化器状态，`dtype="bf16"` 使用 BF16 autocast 前向。共享 state 配方见 [sft_shared_state_full_joint.json](../../configs/train/qwen/sft_shared_state_full_joint.json)，从预热 checkpoint 使用 `--initialize` 启动。checkpoint 保存所有训练参数与优化器状态，可直接恢复训练或评估。
 
 先按[安装说明](../../scripts/README.md#installation)准备并激活 Python 环境，下载base model。以下命令均在仓库根目录执行，`python` 使用当前激活的环境。RLCD 必须指定初始化 checkpoint 或恢复 checkpoint，独立实验输出到新目录。

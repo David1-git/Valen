@@ -4,22 +4,30 @@ from .model import ValenQwen
 from ..manifest import read_base_manifest
 from .heads import head_signature
 from .attention import attention_implementation
+from .pretrained import published_config, with_published_settings
 
 
 def build_qwen(config):
+    config = with_published_settings(config)
     head_config = head_signature(config)
     attention = attention_implementation(config)
-    from transformers import Qwen3_5ForConditionalGeneration
+    from transformers import AutoModel, Qwen3_5ForConditionalGeneration
     dtype = {"bf16": torch.bfloat16, "fp32": torch.float32}[config.get("dtype", "bf16")]
-    # Load the exact published architecture before extracting its backbone.
-    # Loading Qwen3_5Model directly can trigger a language-prefix remapping in
-    # Transformers 5.4 and silently initialize the language tower from scratch.
-    container, loading_info = Qwen3_5ForConditionalGeneration.from_pretrained(
-        config["model_path"], dtype=dtype, attn_implementation=attention,
-        local_files_only=True, output_loading_info=True)
+    published = published_config(config["model_path"]) is not None
+    if published:
+        # 保留发布权重的精度和已训练 Mixer。 / Preserve released tensors and the trained Mixer.
+        container, loading_info = AutoModel.from_pretrained(
+            config["model_path"], trust_remote_code=True, dtype="auto", attn_implementation=attention,
+            local_files_only=True, output_loading_info=True)
+    else:
+        # Loading Qwen3_5Model directly can silently remap language prefixes in Transformers 5.4.
+        container, loading_info = Qwen3_5ForConditionalGeneration.from_pretrained(
+            config["model_path"], dtype=dtype, attn_implementation=attention,
+            local_files_only=True, output_loading_info=True)
     if any(loading_info.get(key) for key in ("missing_keys", "unexpected_keys", "mismatched_keys", "error_msgs")):
         raise ValueError(f"Incomplete pretrained model load: {loading_info}")
-    backbone = container.model
+    backbone = container.backbone if published else container.model
+    head = container.head.float().requires_grad_(True) if published else None
     del container  # Never execute or retain the generation/vocabulary output layer.
     backbone.requires_grad_(False)
     stage = config.get("stage", "joint")
@@ -45,8 +53,8 @@ def build_qwen(config):
             block.requires_grad_(True)
     if config.get("gradient_checkpointing", True) and stage != "warmup":
         backbone.gradient_checkpointing_enable(gradient_checkpointing_kwargs={"use_reentrant": False})
-    model = ValenQwen(backbone, head_config=head_config)
-    if finetuning == "full" and stage == "joint" and dtype == torch.bfloat16:
+    model = ValenQwen(backbone, head_config=head_config, head=head)
+    if dtype == torch.bfloat16 and (published or (finetuning == "full" and stage == "joint")):
         model.backbone_autocast_dtype = torch.bfloat16
     model.base_manifest = read_base_manifest(config["model_path"])
     model.to(config.get("device", "cuda"))

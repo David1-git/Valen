@@ -21,3 +21,12 @@ def test_manifest_reader_rejects_ambiguous_existing_files(tmp_path):
         (tmp_path / name).write_text(json.dumps(manifest))
     with pytest.raises(ValueError, match="Multiple base-model manifests"):
         read_base_manifest(tmp_path)
+
+
+def test_published_export_manifest_identifies_the_actual_finetuning_base(tmp_path):
+    metadata = {"format": "valen_qwen_full_sft_v1", "source_checkpoint_sha256": "trained-checkpoint-sha",
+                "files_sha256": {"model-00001.safetensors": "weight-sha", "config.json": "config-sha"},
+                "base": {"revision": "original-qwen-revision", "weight_sha256": {"model.safetensors": "original-sha"}}}
+    (tmp_path / "export_manifest.json").write_text(json.dumps(metadata))
+    assert read_base_manifest(tmp_path) == {"revision": "sha256:trained-checkpoint-sha",
+                                           "weight_sha256": {"model-00001.safetensors": "weight-sha"}}

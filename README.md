@@ -162,7 +162,9 @@ python -m evaluation.visualdecisionbench.evaluate \
 
 Add `--lora --revision lora-ckpt` to evaluate the earlier LoRA model. Outputs: `predictions.jsonl` and `metrics.json`, including image/video and Choice/Noul/Score breakdowns and elapsed time. Videos use 16 frames; accuracy uses hard labels, while soft-label Score questions contribute probability metrics.
 
-### 3. Training
+### 3. Pre-training
+
+Build a Valen decision model from a Qwen3.5 base using two-stage SFT.
 
 The shared-state recipes use Mixer. Install Flash Attention 2 or set `model.attn_implementation` to `sdpa`. Set your data paths, output directories and training budget in the [configs](configs/train/qwen/); the defaults use smoke data and a 100-step limit.
 
@@ -187,6 +189,27 @@ python -m valen.train --config configs/train/qwen/sft_shared_state_full_joint.js
 ```
 
 For multiple GPUs, use `VALEN_GPUS=8 bash scripts/train/launch.sh <config> [--initialize <checkpoint>]`. See the [training guide](valen/training/README.md) for RLCD rewards and checkpoint recovery.
+
+### 4. Fine-tuning
+
+Start from a released complete Valen model. Download the model and choose **LoRA** or **full fine-tuning**:
+
+```bash
+hf download Valen-Team/Valen-2B --local-dir models/Valen-2B
+
+python -m valen.train --config configs/train/qwen/sft_finetune_lora.json
+# Or update the complete backbone and Mixer:
+python -m valen.train --config configs/train/qwen/sft_finetune_full.json
+```
+
+Set `model.model_path`, `data.path` and your training budget in the chosen config; examples use the small text smoke dataset. Custom text, image and video data follow the [JSONL format](docs/data-format.md). For 0.8B or 4B, download the matching repository and change `model.model_path`. The loader retains the trained backbone and Mixer, and inherits the saved head architecture, shared-state mode and media settings. Explicit head settings must match the released model. These recipes use SDPA.
+
+Published weights are loaded through `model.model_path`, starting a new optimizer and training progress. `--initialize` loads this repository's training checkpoint for a new experiment; `--resume` restores an interrupted task, including optimizer state and progress:
+
+```bash
+python -m valen.train --config configs/train/qwen/sft_finetune_lora.json \
+  --resume output/valen-finetune/lora/latest
+```
 
 <a id="contributions"></a>
 
