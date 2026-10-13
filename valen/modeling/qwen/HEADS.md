@@ -16,7 +16,7 @@ existing checkpoint parameter names. All heads return one FP32 logit per candida
 默认 `question` 模式保留原有分词序列和 Score 的等级独立分支。
 `shared_state` 模式使用一个共享序列，各题读取自身区间和 Decision；Score 的全部
 等级在同一序列中一起评分。四种头的参数结构保持一致，详见
-[共享 state 训练](../../../docs/qwen-shared-state.md)。
+[共享 state 训练](../../../docs/qwen-shared-state_zh.md)。
 
 Candidate rows share parameters and never mix inside the head. This does not make
 the full Qwen model invariant to option order: causal backbone states already depend

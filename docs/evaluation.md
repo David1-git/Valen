@@ -1,12 +1,14 @@
-# 推理与评估
+# Inference and evaluation
 
-本文介绍 `valen` 包内的逐题推理与评估。Sokoban 的完整游戏评测使用独立的 `evaluation.sokoban` 命令，数据生成、策略比较和轨迹回放见[任务评测说明](../evaluation/sokoban/README.md)。
+**English** · [简体中文](evaluation_zh.md)
 
-推理和评估都从 checkpoint 的 `config.json` 重建模型，再加载 `checkpoint.pt` 中的参数。基础模型仍需保存在配置的 `model_path` 下。两种命令的输出格式不同：推理每条记录返回一个响应，评估每道有标签题目输出一行。
+This page covers per-question inference and evaluation in the `valen` package. Full-game Sokoban evaluation uses the separate `evaluation.sokoban` command; see the [task evaluation guide](../evaluation/sokoban/README.md) for data generation, policy comparison and trajectory replay.
 
-## 推理命令
+Both inference and evaluation rebuild the model from the checkpoint's `config.json` and then load the parameters in `checkpoint.pt`. The base model must still be present at the configured `model_path`. The two commands produce different outputs: inference returns one response per record, while evaluation writes one line per labeled question.
 
-在仓库根目录、已激活项目环境的终端中运行：
+## Inference command
+
+Run from the repository root, in a terminal with the project environment activated:
 
 ```bash
 mkdir -p output/predictions
@@ -16,11 +18,11 @@ python -m valen.inference \
   --output output/predictions/smoke.jsonl
 ```
 
-三个路径参数均必填。`--output` 是文件路径，已有文件会被覆盖。`--device` 默认 `cuda`，可指定如 `cuda:1`。该 CLI 是单进程推理，没有按 rank 分片的逻辑。
+All three path arguments are required. `--output` is a file path, and an existing file is overwritten. `--device` defaults to `cuda` and accepts values such as `cuda:1`. This CLI runs single-process inference, with no per-rank sharding.
 
-推理处理全部问题，输入可省略 `targets`；仍需保留 `group_id`。输出行按输入记录顺序排列，不附带 `group_id` 或 `meta`，通过行序和 `answers` 中的问题 ID 对应输入。
+Inference processes every question, and the input may omit `targets`; `group_id` is still required. Output lines follow the input record order and do not carry `group_id` or `meta`; match them to the input by line order and by the question IDs in `answers`.
 
-下面展示一道 Noul 题的响应结构。概率和 token 数仅用于说明字段，不是已训练模型的实测结果。
+The response structure for a single Noul question is shown below. The probability and token counts only illustrate the fields; they are not measurements from a trained model.
 
 ```json
 {
@@ -33,26 +35,26 @@ python -m valen.inference \
 }
 ```
 
-`output_tokens` 固定为 0。`input_tokens` 对公共 state 只计一次，`compute_tokens` 包含分支内重复的 state，具体计算见[架构说明](architecture.md#公共上下文与计算量)。
+`output_tokens` is always 0. `input_tokens` counts the shared state once, while `compute_tokens` includes the state repeated in every branch; see the [architecture notes](architecture.md#shared-context-and-compute) for how they are computed.
 
-## 三种答案的字段
+## Answer fields for the three types
 
-设 `p = softmax(logits / temperature)`，候选数为 K，等级索引从 0 开始。实现见 [answer](../valen/evaluation/inference.py)。
+Let `p = softmax(logits / temperature)`, with K candidates and grade indices starting at 0. The implementation is in [answer](../valen/evaluation/inference.py).
 
-| 类型 | 字段 |
+| Type | Fields |
 | --- | --- |
-| Choice | `type`、`choice`（最大概率候选名）、`probabilities`（候选名 → 概率）、`confidence` |
-| Noul | `type`、`noul`（`true` 的概率）；不另返回 `probabilities` 或 `confidence` |
-| Score | `type`、`score`（`sum(i * p[i])`）、`probabilities`（字符串等级索引 → 概率）、`legend`（索引 → 描述）、`confidence` |
+| Choice | `type`, `choice` (name of the highest-probability candidate), `probabilities` (candidate name → probability), `confidence` |
+| Noul | `type`, `noul` (probability of `true`); no separate `probabilities` or `confidence` |
+| Score | `type`, `score` (`sum(i * p[i])`), `probabilities` (grade index as a string → probability), `legend` (index → description), `confidence` |
 
-Choice 的 `confidence` 将最大概率按均匀分布基线缩放：
+Choice `confidence` rescales the maximum probability against the uniform baseline:
 
 ```text
 K = 1: confidence = 1
 K > 1: confidence = max(0, (max(p) - 1/K) / (1 - 1/K))
 ```
 
-Score 使用相对众数的平均绝对距离：
+Score uses the mean absolute distance from the mode:
 
 ```text
 mode = argmax(p)
@@ -61,24 +63,24 @@ uniform_mad = sum(abs(i - (K-1)/2)) / K
 confidence = max(0, 1 - distance / uniform_mad)
 ```
 
-并列最大值取当前候选顺序中的第一个。Score 的 `score` 是期望值，不是众数，也不自动缩放到 0–1。例如 `[0.1, 0.3, 0.6]` 对应 `score=1.5`、`confidence=0.25`。`confidence` 描述分布集中程度。
+Ties for the maximum go to the first candidate in the current order. Score's `score` is the expected value, not the mode, and is not rescaled to 0–1. For example, `[0.1, 0.3, 0.6]` gives `score=1.5` and `confidence=0.25`. `confidence` describes how concentrated the distribution is.
 
-### Temperature设置
+### Temperature
 
-推理支持 `--calibration path/to/calibration.json`，文件格式为 `{"temperature": 1.0}`。
+Inference supports `--calibration path/to/calibration.json`, where the file has the form `{"temperature": 1.0}`.
 
-**评估 CLI 没有 `--calibration` 参数，固定使用温度 1。**
+**The evaluation CLI has no `--calibration` argument and always uses temperature 1.**
 
-## 评估命令与产物
+## Evaluation commands and outputs
 
 ```bash
-# 合成集只检查流程；正式评估替换为独立测试集。
+# The synthetic set only checks the pipeline; use a held-out test set for real evaluation.
 python -m valen.evaluate \
   --checkpoint output/sft_warmup/latest \
   --data data/smoke/train.jsonl \
   --output output/sft_warmup/smoke_eval
 
-# 同一数据按记录分到四个进程，不填充重复样本。
+# Split the same data across four processes by record, without padding with duplicate samples.
 python -m torch.distributed.run --standalone --nnodes=1 --nproc_per_node=4 \
   -m valen.evaluate \
   --checkpoint output/sft_warmup/latest \
@@ -86,41 +88,41 @@ python -m torch.distributed.run --standalone --nnodes=1 --nproc_per_node=4 \
   --output output/sft_warmup/smoke_eval_4gpu
 ```
 
-这里的 `--output` 是目录，程序会自动创建。输出包括：
+Here `--output` is a directory, which is created automatically. The outputs are:
 
-| 文件 | 内容 |
+| File | Contents |
 | --- | --- |
-| `predictions.rank<N>.jsonl` | 当前 rank 的逐题结果；单进程也会生成 `rank0` |
-| `predictions.jsonl` | rank 0 合并的结果，按 `record_index`、`qid` 排序 |
-| `metrics.json` | 指标、数据与 checkpoint 来源、计数、各卡耗时及延迟分位数 |
+| `predictions.rank<N>.jsonl` | Per-question results of the current rank; a single process also produces `rank0` |
+| `predictions.jsonl` | Results merged by rank 0, sorted by `record_index`, `qid` |
+| `metrics.json` | Metrics, data and checkpoint provenance, counts, per-GPU timings and latency percentiles |
 
-逐题记录包含 `record_index`、`record_id`、`group_id`、`qid`、任务和分组信息、标签分布、预测分布、结构化答案、指标及计时。合并前检查全部有标签题目是否恰好处理一次。多卡进程需能访问同一个输出目录；复用目录会覆盖同名产物。
+Each per-question record contains `record_index`, `record_id`, `group_id`, `qid`, task and grouping information, the label distribution, the predicted distribution, the structured answer, metrics and timings. Before merging, the program checks that every labeled question was processed exactly once. All processes in a multi-GPU run must be able to access the same output directory; reusing a directory overwrites artifacts with the same names.
 
-评估数据至少要有一道有效标签题。全无标签的数据应使用推理命令；当前评估实现会在空延迟集合的分位数统计处失败。
+Evaluation data needs at least one validly labeled question. Use the inference command for fully unlabeled data; the current evaluation implementation fails when computing percentiles over an empty set of latencies.
 
-## 指标口径
+## Metric definitions
 
-记标签分布为 y，预测分布为 p。实现见 [question_metrics / summarize](../valen/evaluation/metrics.py)。
+Let y be the label distribution and p the predicted distribution. The implementation is in [question_metrics / summarize](../valen/evaluation/metrics.py).
 
-| 指标 | 适用范围 | 定义 |
+| Metric | Applies to | Definition |
 | --- | --- | --- |
-| `nll` | 全部有标签题 | `-sum(y[k] * log(p[k]))`，使用自然对数 |
-| `brier` | 全部有标签题 | `sum((p[k] - y[k])²)`，不除候选数 |
-| `accuracy` | 严格 one-hot 标签 | 预测 argmax 与标签 argmax 相同记为 1；Score 也按离散等级判断 |
-| `expected_score_mae` | Score，包括软标签 | `abs(sum(k*p[k]) - sum(k*y[k]))` |
-| `rps` | Score，包括软标签 | 前 K−1 个累积分布差的平方平均 |
-| `macro_f1` | Noul 硬标签 | true/false 两类 F1 的算术平均；某类分母为 0 时该类 F1 记为 0 |
+| `nll` | All labeled questions | `-sum(y[k] * log(p[k]))`, using the natural log |
+| `brier` | All labeled questions | `sum((p[k] - y[k])²)`, not divided by the number of candidates |
+| `accuracy` | Strict one-hot labels | 1 when the predicted argmax equals the label argmax; Score is also judged on discrete grades |
+| `expected_score_mae` | Score, including soft labels | `abs(sum(k*p[k]) - sum(k*y[k]))` |
+| `rps` | Score, including soft labels | Mean of the squared differences between the first K−1 cumulative distributions |
+| `macro_f1` | Noul hard labels | Arithmetic mean of the true and false F1 scores; a class's F1 is 0 when its denominator is 0 |
 
-汇总按**题目等权平均**。`metric_counts` 给出每项指标的有效题数；软标签不计 accuracy，因此该分母通常不同于 `questions`。Noul 的混淆矩阵与 `macro_f1` 只出现在 `task/noul` 和 `task_modality/noul/*` 分组。
+Aggregates are **equal-weight averages over questions**. `metric_counts` gives the number of valid questions for each metric; soft labels do not count toward accuracy, so its denominator usually differs from `questions`. The Noul confusion matrix and `macro_f1` only appear in the `task/noul` and `task_modality/noul/*` groups.
 
-分组key包括 `overall`、`task/*`、`modality/*`、`task_modality/*/*`、`language/*`、`domain/*`。模态优先读取 `meta.modality`；未提供时只有 `text` 和 `media` 两种分类，不自动区分图片与视频。
+Group keys include `overall`, `task/*`, `modality/*`, `task_modality/*/*`, `language/*` and `domain/*`. Modality comes from `meta.modality` when present; otherwise there are only two categories, `text` and `media`, with no automatic distinction between images and video.
 
-## 如何读计时
+## Reading the timings
 
-- `compile_seconds` 是整条 state 的编译耗时，同一 state 的每道题都会记录这一个值。
-- `forward_seconds` 是该题所有分支的模型前向耗时；CUDA 前后执行同步。包含首次执行开销，未做独立 warmup。
-- `compile_plus_forward_seconds` 将上述两项直接相加，不按题分摊 state 编译成本，也不包含完整的结果序列化和写盘流程。
-- `evaluation_wall_seconds` 取各卡评估循环的最大耗时；`load_and_evaluation_wall_seconds` 还包含初始化和模型加载。
-- `questions_per_second` 为有标签题数除以 `evaluation_wall_seconds`。
+- `compile_seconds` is the compile time of the whole state; every question in that state records the same value.
+- `forward_seconds` is the model forward time of all branches of the question, with CUDA synchronization before and after. It includes first-run overhead; there is no separate warmup.
+- `compile_plus_forward_seconds` simply adds the two values above. It does not amortize the state compile cost across questions, and it does not include the full result serialization and disk-write path.
+- `evaluation_wall_seconds` is the longest evaluation-loop time across GPUs; `load_and_evaluation_wall_seconds` also includes initialization and model loading.
+- `questions_per_second` is the number of labeled questions divided by `evaluation_wall_seconds`.
 
-延迟的 mean、p50、p95 按逐题记录计算。同一 state 的编译时间会重复计入，所以不能把逐题延迟求和当成整个数据集耗时。
+Latency mean, p50 and p95 are computed over the per-question records. Because a state's compile time is counted once for each of its questions, summing per-question latencies does not give the time for the whole dataset.

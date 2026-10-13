@@ -1,11 +1,13 @@
-# Qwen shared-state training / 共享 state 训练
+# Qwen shared-state training
+
+**English** · [简体中文](qwen-shared-state_zh.md)
 
 `model.qwen_execution = "shared_state"` enables one Qwen backbone sequence for
 all questions in a record. `share_state` is accepted as a spelling alias and saved
 as `shared_state`. One-question records use exactly the same execution path.
 The default `question` preserves the inputs and Score branches of older models.
 
-## Model and features / 模型与特征
+## Model and features
 
 ```mermaid
 flowchart TD
@@ -48,7 +50,7 @@ Labels and external IDs do not enter the sequence. Training and evaluation retai
 readouts contribute to loss/metrics. Inference returns all requested readouts.
 A record without any labels is skipped before reading media during training.
 
-## Batching and losses / 批量与损失
+## Batching and losses
 
 Within a state, all questions reuse one backbone forward and one backward graph.
 With `microbatch_size > 1`, different states form separate padded rows in one
@@ -76,7 +78,7 @@ Frozen-feature caching remains limited to microbatch size 1.
 `max_length` applies to the entire state, schemas and readouts. Overlong records
 raise an error; no questions or tokens are silently dropped.
 
-## Prepare data / 整理训练数据
+## Prepare data
 
 Native multi-question JSONL records can be used directly. For a one-QA-per-record
 mixture, group records with identical state, group ID, assets and source/domain/
@@ -107,7 +109,7 @@ warmup subset keeps 99.5k QA. Use `question_mean` to retain those QA proportions
 The initial question limit of four does not guarantee a token limit; if a compiled
 record is too long, reduce the question limit or adjust media/sequence budgets.
 
-## Two-stage training / 两阶段训练
+## Two-stage training
 
 The recipes use Qwen3.5-2B, Mixer and FlashAttention-2. They initially point to
 smoke data and cap training at 100 steps. Copy them into a new experiment, set
@@ -134,7 +136,7 @@ resume. `--resume` requires the same execution mode and loss reduction; use
 `--initialize` with a new output directory when changing either. Warmup to joint
 initialization retains the same shared-state input format.
 
-## Validation / 验证
+## Validation
 
 ```bash
 python -m pytest -q tests/qwen/test_shared_state.py \

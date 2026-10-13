@@ -146,7 +146,7 @@ print(model.predict({
 }, execution="shared_state"))
 ```
 
-逐题推理使用 `execution="question"`；安装 Flash Attention 后可设置 `attn_implementation="flash_attention_2"`。图片和视频输入见[数据格式](docs/data-format.md)。
+逐题推理使用 `execution="question"`；安装 Flash Attention 后可设置 `attn_implementation="flash_attention_2"`。图片和视频输入见[数据格式](docs/data-format_zh.md)。
 
 ### 2. 评估 VisualDecisionBench
 
@@ -202,7 +202,7 @@ python -m valen.train --config configs/train/qwen/sft_finetune_lora.json
 python -m valen.train --config configs/train/qwen/sft_finetune_full.json
 ```
 
-在所选配置中设置 `model.model_path`、`data.path` 和训练预算；示例使用小型纯文本 smoke 数据。自有文本、图片和视频数据遵循 [JSONL 格式](docs/data-format.md)。使用 0.8B 或 4B 时，下载对应仓库并修改 `model.model_path`。加载器保留已训练的主干和 Mixer，并继承发布模型的决策头结构、共享 state 模式和媒体设置；显式设置的决策头参数必须与模型一致。这两份配方使用 SDPA。
+在所选配置中设置 `model.model_path`、`data.path` 和训练预算；示例使用小型纯文本 smoke 数据。自有文本、图片和视频数据遵循 [JSONL 格式](docs/data-format_zh.md)。使用 0.8B 或 4B 时，下载对应仓库并修改 `model.model_path`。加载器保留已训练的主干和 Mixer，并继承发布模型的决策头结构、共享 state 模式和媒体设置；显式设置的决策头参数必须与模型一致。这两份配方使用 SDPA。
 
 发布权重通过 `model.model_path` 加载，并开始新的优化器和训练进度。`--initialize` 用于从本仓库的训练 checkpoint 开始新实验；`--resume` 用于恢复中断的任务，包括优化器状态和进度：
 
