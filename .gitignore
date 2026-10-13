@@ -1,6 +1,9 @@
 # Local environments and Python build/cache files
 .venv/
 .venv-api/
+.venv-notebooks/
+.ipynb_checkpoints/
+.valen-cookbook/
 .gpu-venv/
 __pycache__/
 *.py[cod]

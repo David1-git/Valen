@@ -24,7 +24,7 @@
 
 <p align="center">
   <b>English</b> · <a href="README_zh.md">简体中文</a><br>
-  <a href="#introduction">Intro</a> · <a href="#news">News</a> · <a href="#demos">Demos</a> · <a href="#model-downloads">Models &amp; datasets</a> · <a href="#results">Eval results</a> · <a href="#quick-start">Quick start</a> · <a href="cookbook/README.md">Cookbook</a>
+  <a href="#introduction">Intro</a> · <a href="#news">News</a> · <a href="#demos">Demos</a> · <a href="#model-downloads">Models &amp; datasets</a> · <a href="#results">Eval results</a> · <a href="#quick-start">Quick start</a> · <a href="cookbook/api_quickstart.ipynb">Cookbook</a>
 </p>
 
 <a id="introduction"></a>
@@ -117,7 +117,7 @@ Earlier results remain in the [archived README](history/README_preview.md).
 
 ## 🚀 Quick start
 
-First time using Valen? Start with the **[Cookbook](cookbook/README.md)**: [call the API without a GPU](cookbook/api.md), or [download a model and run text, image and video inference locally](cookbook/local_inference.md). Runnable examples and troubleshooting are included. [简体中文](cookbook/README_zh.md)
+Learn by running the Cookbook notebooks: **[API quick start](cookbook/api_quickstart.ipynb)** · **[model download and local inference](cookbook/local_inference.ipynb)**. Both use real evaluation cases with input previews, executable cells and saved results. 简体中文：[API 入门](cookbook/api_quickstart_zh.ipynb) · [下载与本地推理](cookbook/local_inference_zh.ipynb).
 
 [Install the dependencies](scripts/README.md#installation). Run `hf auth login` if the Hugging Face repositories require access.
 
