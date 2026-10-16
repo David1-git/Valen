@@ -94,6 +94,36 @@ def options(folder, **kwargs):
                 stage="joint", finetuning_type="full", gradient_checkpointing=False, **kwargs)
 
 
+def test_decision_index_engine_preserves_published_predictions(published):
+    pytest.importorskip("decision_index")
+    from decision_index.engines import Unsupported, load_engine, validate
+    from valen.evaluation.inference import predict
+    folder, original = published
+    engine = load_engine("evaluation.decision_index.engine:ValenEngine", model=str(folder), device="cpu")
+    questions = {
+        "animal": {"type": "choice", "instructions": {"task": "Which animal"},
+                   "criteria": {"cat": {"label": "cat"}, "dog": None}},
+        "truth": {"type": "noul", "instructions": "cat"},
+    }
+    response, _ = engine({"scene": "A cat"}, questions)
+    validate(questions, response)
+    compiled = engine.compiler.compile({"request": {
+        "state": '{"scene":"A cat"}', "questions": {
+            "animal": {"type": "choice", "instructions": '{"task":"Which animal"}',
+                       "criteria": {"cat": '{"label":"cat"}', "dog": "dog"}},
+            "truth": questions["truth"],
+        }}})
+    expected = predict(original, compiled)["answers"]
+    for key, value in expected["animal"]["probabilities"].items():
+        assert response["answers"]["animal"]["probabilities"][key] == pytest.approx(value, abs=1e-6)
+    assert response["answers"]["truth"]["noul"] == pytest.approx(expected["truth"]["noul"], abs=1e-6)
+    assert engine.config["max_length"] == 1024
+    assert not any(p.requires_grad for p in engine.model.parameters())
+    with pytest.raises(Unsupported, match="exceed max_length"):
+        engine("cat " * 2000, questions)
+    engine.close()
+
+
 def state_for(modality):
     if modality == "text":
         ids = torch.tensor([[1, 2, 3, 4, 5, 6]])
