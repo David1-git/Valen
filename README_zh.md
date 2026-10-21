@@ -1,51 +1,62 @@
 <p align="center">
-  <img src="assets/branding/valen-logo-v5-compact.svg" alt="Valen — 青绿色光圈、前进箭头与大写字标" width="720"><br>
-  <img src="assets/branding/valen-slogan.svg" alt="System One Model, now with vision." width="700">
+  <img src="assets/branding/valen-mark-white.png" alt="Valen" width="112">
+</p>
+<h1 align="center">Valen</h1>
+<p align="center"><strong>快速决策，持续进化。</strong></p>
+<p align="center">多模态 System One 决策模型。输入文本、图像和视频，输出结构化决策概率。</p>
+
+<p align="center">
+  <a href="https://huggingface.co/Valen-Team/Valen-0.8B"><img src="https://img.shields.io/badge/Valen-0.8B-3964FE?style=flat&amp;labelColor=1E232C" alt="Valen 0.8B"></a>
+  <a href="https://huggingface.co/Valen-Team/Valen-2B"><img src="https://img.shields.io/badge/Valen-2B-3964FE?style=flat&amp;labelColor=1E232C" alt="Valen 2B"></a>
+  <a href="https://huggingface.co/Valen-Team/Valen-4B"><img src="https://img.shields.io/badge/Valen-4B-3964FE?style=flat&amp;labelColor=1E232C" alt="Valen 4B"></a>
+  <a href="https://huggingface.co/datasets/Valen-Team/VisualDecisionBench"><img src="https://img.shields.io/badge/Dataset-VisualDecisionBench-3964FE?style=flat&amp;labelColor=1E232C" alt="VisualDecisionBench"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/License-Apache_2.0-555555?style=flat&amp;labelColor=1E232C" alt="Apache 2.0"></a>
+  <a href="pyproject.toml"><img src="https://img.shields.io/badge/Python-3.10%2B-555555?style=flat&amp;labelColor=1E232C" alt="Python 3.10+"></a>
 </p>
 
 <p align="center">
-  受 <a href="https://typesafe.ai/blog/introducing-system-one-models-and-jev">Jev</a> 启发的多模态决策模型——输入文本、图像和视频，输出决策概率。
+  <a href="README.md">English</a> · <strong>简体中文</strong><br>
+  <a href="https://valen-team.github.io/zh-Hans/">在线体验</a> · <a href="https://valen-team.github.io/zh-Hans/docs/">文档</a> · <a href="https://valen-team.github.io/zh-Hans/docs/valen/api/">API</a> · <a href="https://huggingface.co/Valen-Team">Hugging Face</a>
 </p>
 
 <p align="center">
-  <a href="https://huggingface.co/Valen-Team"><img src="https://img.shields.io/badge/Hugging_Face-Valen_Team-FFD21E?style=flat&amp;logo=huggingface&amp;logoColor=FFD21E&amp;labelColor=555555" alt="Hugging Face 组织：Valen Team"></a>
-  <a href="LICENSE"><img src="https://img.shields.io/badge/License-Apache_2.0-80A51B?style=flat&amp;labelColor=555555" alt="许可证：Apache 2.0"></a>
-  <a href="pyproject.toml"><img src="https://img.shields.io/badge/Python-3.10%2B-1683BB?style=flat&amp;logo=python&amp;logoColor=FFD43B&amp;labelColor=555555" alt="Python 3.10+"></a>
-  <a href="configs/train/"><img src="https://img.shields.io/badge/Training-SFT_%7C_RLCD-8A63B8?style=flat&amp;labelColor=555555" alt="SFT 与实验性 RLCD"></a>
-  <br>
-  <a href="https://huggingface.co/Valen-Team/Valen-0.8B"><img src="https://img.shields.io/badge/Valen-0.8B-E88B23?style=flat&amp;logo=huggingface&amp;logoColor=FFD21E&amp;labelColor=555555" alt="Valen 0.8B"></a>
-  <a href="https://huggingface.co/Valen-Team/Valen-2B"><img src="https://img.shields.io/badge/Valen-2B-E88B23?style=flat&amp;logo=huggingface&amp;logoColor=FFD21E&amp;labelColor=555555" alt="Valen 2B"></a>
-  <a href="https://huggingface.co/Valen-Team/Valen-4B"><img src="https://img.shields.io/badge/Valen-4B-E88B23?style=flat&amp;logo=huggingface&amp;logoColor=FFD21E&amp;labelColor=555555" alt="Valen 4B"></a>
-  <a href="https://huggingface.co/spaces/yuhangzang/Valen-Preview-0923"><img src="https://img.shields.io/badge/Space-Try_Demo-009C83?style=flat&amp;logo=huggingface&amp;logoColor=FFD21E&amp;labelColor=555555" alt="在线体验 Valen：Hugging Face Spaces"></a>
-  <a href="https://huggingface.co/datasets/Valen-Team/Valen-Training-General-100k"><img src="https://img.shields.io/badge/Train-General_100k-2185B5?style=flat&amp;logo=huggingface&amp;logoColor=FFD21E&amp;labelColor=555555" alt="训练集：Valen-Training-General-100k"></a>
-  <a href="https://huggingface.co/datasets/Valen-Team/VisualDecisionBench"><img src="https://img.shields.io/badge/Eval-VisualDecisionBench-2185B5?style=flat&amp;logo=huggingface&amp;logoColor=FFD21E&amp;labelColor=555555" alt="VisualDecisionBench"></a>
-  <a href="https://huggingface.co/datasets/Valen-Team/Valen-Eval-Game"><img src="https://img.shields.io/badge/Eval-Game-2185B5?style=flat&amp;logo=huggingface&amp;logoColor=FFD21E&amp;labelColor=555555" alt="游戏评测集：Valen-Eval-Game"></a>
-</p>
-
-<p align="center">
-  <a href="README.md">English</a> · <b>简体中文</b><br>
-  <a href="#简介">简介</a> · <a href="#news">News</a> · <a href="#演示">演示</a> · <a href="#模型下载">模型与数据集</a> · <a href="#实验结果">评测结果</a> · <a href="#快速开始">快速开始</a> · <a href="cookbook/api_quickstart_zh.ipynb">Cookbook</a>
+  <a href="#简介">简介</a> · <a href="#模型下载">模型与数据集</a> · <a href="#api-usage">API 调用</a> · <a href="#快速开始">快速开始</a> · <a href="#演示">演示</a> · <a href="#实验结果">评测结果</a> · <a href="cookbook/api_quickstart_zh.ipynb">Cookbook</a>
 </p>
 
 <a id="简介"></a>
 
-## ✨ 简介
+## 简介
 
 Valen（万澜）将视觉感知引入 System One 决策。受 [Jev](https://typesafe.ai/blog/introducing-system-one-models-and-jev) 启发，它根据任务指令，对文本、图像和视频中的信息进行判断，直接输出给定候选的概率分布，为程序提供结构化的决策接口。仓库提供模型实现、数据处理、SFT 与实验性 RLCD 训练，以及推理和评估命令，支持使用自有数据训练。
 
 <a id="news"></a>
 
-## 📰 News
+## 最新动态
+
+- **2026-10-21**：官网[聊天](https://valen-team.github.io/zh-Hans/)与[中英文文档](https://valen-team.github.io/zh-Hans/docs/)上线；提供无需 Key 的[免费决策 API](#api-usage)。
 
 - **2026-10-13**：发布 Valen 模型的 ONNX 和 GGUF 版本，可在 [Hugging Face](https://huggingface.co/Valen-Team) 下载。
 - **2026-10-13**：支持通过 API 调用 `valen-preview-0923`、`valen-0-8b`、`valen-2b` 和 `valen-4b`，使用示例见 [API 入门 Notebook](cookbook/api_quickstart_zh.ipynb)。
 - **2026-10-07**：**更快、更准、更通用。** 发布支持文本、图像和视频的最新多模态 System One 模型 **Valen（[0.8B](https://huggingface.co/Valen-Team/Valen-0.8B) / [2B](https://huggingface.co/Valen-Team/Valen-2B) / [4B](https://huggingface.co/Valen-Team/Valen-4B)）**，以及 [**VisualDecisionBench**](https://huggingface.co/datasets/Valen-Team/VisualDecisionBench) 评测基准。
-- **2026-09-30**：**Training&Inference Support:** 支持 Flash Attention 2 训练与推理、多机多卡训练，并提高训练时的 GPU 显存利用率。
+- **2026-09-30**：**训练与推理支持：** 支持 Flash Attention 2 训练与推理、多机多卡训练，并提高训练时的 GPU 显存利用率。
 - **2026-09-23**：**Valen** 仓库开源，同时发布 [**Valen-preview-0923**](https://huggingface.co/Valen-Team/Valen-Preview-0923) 及其对应的[**训练数据**](https://huggingface.co/datasets/Valen-Team/Valen-Training-General-100k)。
+
+<a id="模型下载"></a>
+
+## 模型与数据集
+
+| 模型 | 下载 |
+| --- | --- |
+| Valen 0.8B | [🤗 Valen-0.8B](https://huggingface.co/Valen-Team/Valen-0.8B) |
+| Valen 2B | [🤗 Valen-2B](https://huggingface.co/Valen-Team/Valen-2B) |
+| Valen 4B | [🤗 Valen-4B](https://huggingface.co/Valen-Team/Valen-4B) |
+| Valen-preview-0923（早期版本） | [🤗 Hugging Face](https://huggingface.co/Valen-Team/Valen-Preview-0923) |
+
+[VisualDecisionBench](https://huggingface.co/datasets/Valen-Team/VisualDecisionBench) 包含 Image 和 Video 两个子集，用于图像与视频决策评测。此前发布的 [General 100k](https://huggingface.co/datasets/Valen-Team/Valen-Training-General-100k) 用于训练，[General 5k](https://huggingface.co/datasets/Valen-Team/Valen-Eval-General-5k) 用于评测，[Sokoban](https://huggingface.co/datasets/Valen-Team/Valen-Eval-Game) 用于游戏训练与评测。
 
 <a id="演示"></a>
 
-## 🎬 演示
+## 演示
 
 **Valen** 图像与视频决策演示，点击预览观看完整视频。
 
@@ -82,22 +93,13 @@ Valen（万澜）将视觉感知引入 System One 决策。受 [Jev](https://typ
   </tr>
 </table>
 
-<a id="模型下载"></a>
-
-## 📥 模型与数据集
-
-| 模型 | 下载 |
-| --- | --- |
-| Valen 0.8B | [🤗 Valen-0.8B](https://huggingface.co/Valen-Team/Valen-0.8B) |
-| Valen 2B | [🤗 Valen-2B](https://huggingface.co/Valen-Team/Valen-2B) |
-| Valen 4B | [🤗 Valen-4B](https://huggingface.co/Valen-Team/Valen-4B) |
-| Valen-preview-0923（早期版本） | [🤗 Hugging Face](https://huggingface.co/Valen-Team/Valen-Preview-0923) |
-
-[VisualDecisionBench](https://huggingface.co/datasets/Valen-Team/VisualDecisionBench) 包含 Image 和 Video 两个子集，用于图像与视频决策评测。此前发布的 [General 100k](https://huggingface.co/datasets/Valen-Team/Valen-Training-General-100k) 用于训练，[General 5k](https://huggingface.co/datasets/Valen-Team/Valen-Eval-General-5k) 用于评测，[Sokoban](https://huggingface.co/datasets/Valen-Team/Valen-Eval-Game) 用于游戏训练与评测。
-
 <a id="实验结果"></a>
 
-## 📊 评测结果 — Valen
+## 评测结果 — Valen
+
+[JevalKit](https://github.com/Valen-Team/JevalKit) 是我们的决策模型评测工具，提供统一的模型接口、Benchmark 接入和评分协议，可用于在支持的评测任务上评估与比较不同决策模型。
+
+Valen 也已接入 [Jev Decision Index](https://huggingface.co/spaces/multimodalart/jev-decision-index)，可前往查看该评测中的结果及与其他决策模型的对比。
 
 **覆盖 0.8B、2B、4B 的视觉决策模型。** Valen 采用 Qwen3.5 + Mixer 和共享 state 推理，在百万级样本上进行 SFT。以下在 **VisualDecisionBench-Image、VisualDecisionBench-Video、公开 JevBench** 三组评测中，与已发布的决策模型进行对比。
 
@@ -117,13 +119,103 @@ Valen（万澜）将视觉感知引入 System One 决策。受 [Jev](https://typ
 
 <a id="快速开始"></a>
 
-## 🚀 快速开始
+## 快速开始
 
 通过 Cookbook Notebook 逐步上手：**[API 入门](cookbook/api_quickstart_zh.ipynb)** · **[下载模型与本地推理](cookbook/local_inference_zh.ipynb)**。两份教程都使用真实验证案例，展示输入、可执行代码和已保存结果。English: [API](cookbook/api_quickstart.ipynb) · [Local inference](cookbook/local_inference.ipynb).
 
-先按[安装说明](scripts/README.md#installation)准备依赖；Hugging Face 仓库需要访问权限时，先运行 `hf auth login`。
+<a id="api-usage"></a>
 
-### 1. 推理
+### 1. API 调用
+
+无需下载模型或准备 GPU。通过[官网聊天](https://valen-team.github.io/zh-Hans/)直接体验，或在 Python 中调用免费接口：
+
+```bash
+python -m pip install requests
+```
+
+```python
+import requests
+
+response = requests.post(
+    "https://api.valen-team.workers.dev/v1/decisions",
+    headers={"Origin": "https://valen-team.github.io"},
+    json={
+        "model": "valen-2b",
+        "input": "请把订单寄到我的新地址。",
+        "questions": [{
+            "name": "q0",
+            "type": "predicate",
+            "instructions": "用户是否要求更改收货地址？",
+        }],
+        "temperature": 1.0,
+    },
+    timeout=120,
+)
+response.raise_for_status()
+answer = response.json()["answers"][0]
+print(answer["probability"])  # 条件成立的概率，范围 0–1
+```
+
+#### 三种原生输出
+
+| 类型 | 问题字段 | 主要返回字段 |
+| --- | --- | --- |
+| `predicate` | `instructions` | `probability`：条件成立的概率 |
+| `choice` | `instructions`、`choices: [{value, description}, …]` | `choice` 和候选项 `probabilities` |
+| `score` | `instructions`、`levels: [{label, description}, …]` | `score` 和各档位 `probabilities` |
+
+选择题可将上例中的 `questions[0]` 替换为：
+
+```json
+{
+  "name": "q0",
+  "type": "choice",
+  "instructions": "用户希望修改订单的哪一项？",
+  "choices": [
+    {"value": "address", "description": "收货地址"},
+    {"value": "quantity", "description": "商品数量"}
+  ]
+}
+```
+
+评分使用有序档位：
+
+```json
+{
+  "name": "q0",
+  "type": "score",
+  "instructions": "评估用户修改订单的意愿强度。",
+  "levels": [
+    {"label": "低", "description": "未提出修改要求"},
+    {"label": "中", "description": "询问能否修改"},
+    {"label": "高", "description": "明确要求修改"}
+  ]
+}
+```
+
+`score` 是从 0 开始的档位索引的概率加权平均值；上面的三档范围为 0–2，五档则为 0–4。评分分布条目包含 `label`、数值索引 `value` 和 `probability`。`confidence` 是独立字段，不是评分或最大候选概率。
+
+#### 免费额度与更高额度
+
+支持 `valen-preview-0923`、`valen-0-8b`、`valen-2b`、`valen-4b`。免费入口每次接受一个 `name: "q0"` 的问题，选择题与评分各支持 2–8 个选项或档位，`temperature` 固定为 `1.0`。文本最多 4000 字符，指令最多 1000 字符，每项描述最多 300 字符，请求体不超过 4,500,000 字节。免费服务有频率与容量限制，HTTP 429 时请稍后重试，避免并发批量调用。
+
+示例的 `Origin` 是免费代理要求的请求头，不是身份凭据；目前不开放其他网站的浏览器跨域调用。图片通过内联 data URL 发送；官网的视频体验先在本地提取中间帧，再作为图片发送。单帧不能判断运动或事件顺序。完整示例与限制见 [API 文档](https://valen-team.github.io/zh-Hans/docs/valen/api/)。
+
+需要批量调用或更高额度，请邮件联系 [liuziyu77@sjtu.edu.cn](mailto:liuziyu77@sjtu.edu.cn)，说明用途与预计调用量。获批后使用官方接口和自己的 Key：
+
+```python
+import os
+
+url = "https://llm-proxy.openxxlab.com/v1/decisions"
+headers = {"Authorization": "Bearer " + os.environ["VALEN_API_KEY"]}
+# 在上面的 requests.post 中替换 URL 和 headers，其余结构保持一致。
+```
+
+Key 只保存在服务端环境变量中。托管 API 使用 `input`、问题列表、`choices` / `levels` 和 `predicate`；本地模型使用 `state`、问题映射、`criteria` 和 `noul`，两种请求格式不能混用。
+
+### 2. 本地推理
+
+先按[安装说明](scripts/README.md#installation)准备依赖；Hugging Face 仓库需要访问权限时，先运行 `hf auth login`。
 
 ```python
 import torch
@@ -148,7 +240,7 @@ print(model.predict({
 
 逐题推理使用 `execution="question"`；安装 Flash Attention 后可设置 `attn_implementation="flash_attention_2"`。图片和视频输入见[数据格式](docs/data-format_zh.md)。
 
-### 2. 评估 VisualDecisionBench
+### 3. 评估 VisualDecisionBench
 
 下载并解压媒体，然后运行[评估脚本](evaluation/visualdecisionbench/evaluate.py)：
 
@@ -162,7 +254,7 @@ python -m evaluation.visualdecisionbench.evaluate \
 
 添加 `--lora --revision lora-ckpt` 可评估旧 LoRA 模型。输出 `predictions.jsonl` 和 `metrics.json`，包含图像/视频、Choice/Noul/Score 分项与耗时。视频采样 16 帧；准确率仅统计硬标签题，软标签 Score 题参与概率指标计算。
 
-### 3. Pre-training（预训练）
+### 4. 预训练
 
 从 Qwen3.5 基座出发，通过两阶段 SFT 构建 Valen 决策模型。
 
@@ -190,7 +282,7 @@ python -m valen.train --config configs/train/qwen/sft_shared_state_full_joint.js
 
 多卡使用 `VALEN_GPUS=8 bash scripts/train/launch.sh <config> [--initialize <checkpoint>]`。奖励设置与 checkpoint 恢复见[训练指南](valen/training/README.md)。
 
-### 4. Fine-tuning（微调）
+### 5. 微调
 
 从已发布的完整 Valen 模型继续训练。下载模型后，选择 **LoRA** 或**全参数微调**：
 
@@ -213,19 +305,19 @@ python -m valen.train --config configs/train/qwen/sft_finetune_lora.json \
 
 <a id="参与贡献"></a>
 
-## 🤝 参与贡献
+## 参与贡献
 
-欢迎一起改进 Valen。你可以通过 [Issues](https://github.com/Liuziyu77/Valen/issues) 反馈问题、分享应用场景和实验结果，也可以提交 [Pull Requests](https://github.com/Liuziyu77/Valen/pulls) 改进代码与文档、补充训练数据或评测任务。积极为 Valen 作出贡献的开发者有机会加入核心开发团队。
+欢迎一起改进 Valen。你可以通过 [Issues](https://github.com/Valen-Team/Valen/issues) 反馈问题、分享应用场景和实验结果，也可以提交 [Pull Requests](https://github.com/Valen-Team/Valen/pulls) 改进代码与文档、补充训练数据或评测任务。积极为 Valen 作出贡献的开发者有机会加入核心开发团队。
 
 欢迎扫描下方二维码加入 Valen 微信群，一起讨论项目、交流使用体验和实验结果。
 
 <p align="center">
-  <img src="assets/figures/wechat_1020.jpg" alt="Valen 微信讨论群二维码" width="200">
+  <img src="assets/figures/wechat_1021.png" alt="Valen 微信讨论群二维码" width="200">
 </p>
 
 <a id="许可与致谢"></a>
 
-## 📄 许可与致谢
+## 许可与致谢
 
 代码使用 [Apache 2.0](LICENSE) 许可。基础模型和来源数据集遵循各自的许可。
 
@@ -233,7 +325,7 @@ python -m valen.train --config configs/train/qwen/sft_finetune_lora.json \
 
 <a id="引用"></a>
 
-## 📚 引用
+## 引用
 
 如果你在工作中使用 Valen，请引用本仓库：
 
@@ -241,9 +333,9 @@ python -m valen.train --config configs/train/qwen/sft_finetune_lora.json \
 @misc{valen,
   author       = {{Valen Team}},
   title        = {Valen},
-  howpublished = {GitHub - Liuziyu77/Valen: A multimodal System One decision model for text, images and video.},
+  howpublished = {GitHub - Valen-Team/Valen: A multimodal System One decision model for text, images and video.},
   note         = {GitHub repository},
   year         = {2026},
-  url          = {https://github.com/Liuziyu77/Valen}
+  url          = {https://github.com/Valen-Team/Valen}
 }
 ```

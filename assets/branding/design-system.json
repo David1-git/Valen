@@ -1,0 +1,9 @@
+{
+  "source": "Valen-Team/design-system",
+  "version": "0.5.0",
+  "profile": "modern",
+  "primary": "#3964FE",
+  "assets": {
+    "valen-mark-white.png": "657c4be26bbe1a08e450afef47d1859acd771cb049a0847ede05b621865d2583"
+  }
+}
