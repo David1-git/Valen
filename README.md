@@ -121,7 +121,7 @@ Earlier results remain in the [archived README](history/README_preview.md).
 
 ## Quick start
 
-Learn by running the Cookbook notebooks: **[API quick start](cookbook/api_quickstart.ipynb)** · **[model download and local inference](cookbook/local_inference.ipynb)**. Both use real evaluation cases with input previews, executable cells and saved results. 简体中文：[API 入门](cookbook/api_quickstart_zh.ipynb) · [下载与本地推理](cookbook/local_inference_zh.ipynb).
+For a local HTTP service, start with the [SGLang container guide](docs/inference.md). For Python examples, use the Cookbook notebooks: **[API quick start](cookbook/api_quickstart.ipynb)** · **[Transformers local inference](cookbook/local_inference.ipynb)**. Both use real evaluation cases with input previews, executable cells and saved results. 简体中文：[API 入门](cookbook/api_quickstart_zh.ipynb) · [下载与本地推理](cookbook/local_inference_zh.ipynb).
 
 <a id="api-usage"></a>
 
@@ -214,6 +214,32 @@ headers = {"Authorization": "Bearer " + os.environ["VALEN_API_KEY"]}
 Keep keys in server-side environment variables. The hosted API uses `input`, a question list, `choices` / `levels`, and `predicate`; the local model uses `state`, a question mapping, `criteria`, and `noul`. These request formats are distinct.
 
 ### 2. Local inference
+
+#### SGLang container
+
+Run a local HTTP service with the public Valen-Team image. Requires Linux x86-64, an NVIDIA GPU, a CUDA 13-compatible driver, and Docker with NVIDIA Container Toolkit. Weights download on first launch.
+
+```bash
+docker pull ghcr.io/valen-team/sglang:valen-v0.1.0
+docker run --rm --gpus device=0 --ipc=host \
+  -p 127.0.0.1:30000:30000 \
+  -v "$HOME/.cache/huggingface:/root/.cache/huggingface" \
+  ghcr.io/valen-team/sglang:valen-v0.1.0 \
+  --model-path Valen-Team/Valen-2B --served-model-name valen \
+  --host 0.0.0.0 --port 30000
+```
+
+After the server is ready:
+
+```bash
+curl http://localhost:30000/v1/systemone \
+  -H 'Content-Type: application/json' \
+  -d '{"model":"valen","state":"A cat is on the sofa.","questions":{"on_sofa":{"type":"noul","instructions":"The cat is on the sofa."}}}'
+```
+
+Supports text/images and choice/noul/score decisions in single-GPU `shared_state` mode. For image requests, downloaded weights, response fields, and validation scope, see the [SGLang inference guide](docs/inference.md). Direct video input uses the Transformers route below.
+
+#### Transformers
 
 [Install the dependencies](scripts/README.md#installation). Run `hf auth login` if the Hugging Face repositories require access.
 
