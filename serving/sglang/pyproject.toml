@@ -1,0 +1,26 @@
+[build-system]
+requires = ["setuptools>=77", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "valen-sglang"
+version = "0.1.0.dev2"
+description = "Native Valen decision plugin for a pinned SGLang runtime"
+readme = "README.md"
+requires-python = ">=3.11"
+license = "Apache-2.0"
+license-files = ["LICENSE", "NOTICE"]
+authors = [{name = "Valen-Team"}]
+
+[project.entry-points."sglang.srt.plugins"]
+valen = "valen_sglang.plugin:register"
+
+[project.scripts]
+valen-sglang = "valen_sglang.launch_server:main"
+valen-sglang-doctor = "valen_sglang.compatibility:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+valen_sglang = ["runtime-lock.json"]

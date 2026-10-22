@@ -121,7 +121,7 @@ Valen 也已接入 [Jev Decision Index](https://huggingface.co/spaces/multimodal
 
 ## 快速开始
 
-启动本地 HTTP 服务请阅读 [SGLang 镜像指南](docs/inference_zh.md)；Python 示例请参考 Cookbook Notebook：**[API 入门](cookbook/api_quickstart_zh.ipynb)** · **[Transformers 本地推理](cookbook/local_inference_zh.ipynb)**。两份教程都使用真实验证案例，展示输入、可执行代码和已保存结果。English: [API](cookbook/api_quickstart.ipynb) · [Local inference](cookbook/local_inference.ipynb).
+启动本地 HTTP 服务请阅读 [SGLang 部署指南](docs/inference_zh.md)；Python 示例请参考 Cookbook Notebook：**[API 入门](cookbook/api_quickstart_zh.ipynb)** · **[Transformers 本地推理](cookbook/local_inference_zh.ipynb)**。两份教程都使用真实验证案例，展示输入、可执行代码和已保存结果。English: [API](cookbook/api_quickstart.ipynb) · [Local inference](cookbook/local_inference.ipynb).
 
 <a id="api-usage"></a>
 
@@ -217,7 +217,7 @@ Key 只保存在服务端环境变量中。托管 API 使用 `input`、问题列
 
 #### SGLang 镜像
 
-使用 Valen-Team 提供的公开镜像启动本地 HTTP 服务。需要 Linux x86-64、NVIDIA GPU、兼容 CUDA 13 的驱动，以及已配置 NVIDIA Container Toolkit 的 Docker。首次启动会下载模型权重。
+使用预构建镜像启动服务，需要 NVIDIA GPU、兼容 CUDA 13 的驱动和 NVIDIA Container Toolkit：
 
 ```bash
 docker pull ghcr.io/valen-team/sglang:valen-v0.1.0
@@ -229,7 +229,11 @@ docker run --rm --gpus device=0 --ipc=host \
   --host 0.0.0.0 --port 30000
 ```
 
-服务就绪后发送请求：
+#### SGLang 插件
+
+已有兼容的官方 SGLang 环境时，可安装 `valen-sglang` wheel。当前需[从源码构建部署包](serving/sglang/README_zh.md)，引擎版本与依赖要求见该说明。
+
+两种方式均提供 `/v1/systemone`，支持单 GPU 文本/图片 choice、noul、score 决策。服务就绪后发送请求：
 
 ```bash
 curl http://localhost:30000/v1/systemone \
@@ -237,7 +241,7 @@ curl http://localhost:30000/v1/systemone \
   -d '{"model":"valen","state":"A cat is on the sofa.","questions":{"on_sofa":{"type":"noul","instructions":"The cat is on the sofa."}}}'
 ```
 
-支持文本/图片输入，以及单 GPU `shared_state` 模式的 choice/noul/score 决策。图片请求、离线权重挂载、返回字段与验证范围见 [SGLang 推理指南](docs/inference_zh.md)。直接传入视频请使用下面的 Transformers 方式。
+详细步骤：[镜像部署](https://valen-team.github.io/zh-Hans/docs/valen/sglang-image/) · [插件部署](https://valen-team.github.io/zh-Hans/docs/valen/sglang-plugin/)。
 
 #### Transformers
 

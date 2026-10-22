@@ -1,0 +1,6 @@
+Valen-Team SGLang serving kit.
+Native Valen head and prompt compiler adapted from the Valen-Team SGLang integration
+(commit 6b0e4e1763b1d3bacd78a84d19d9b0675afe94b8), Apache-2.0.
+Service adapters use SGLang APIs and portions of System One response formatting
+from SGLang (https://github.com/sgl-project/sglang), Copyright 2023-2024 SGLang Team, Apache-2.0.
+The kit installs no SGLang source files and modifies no installed engine files.
