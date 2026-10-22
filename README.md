@@ -243,9 +243,20 @@ curl http://localhost:30000/v1/systemone \
 
 Full instructions: [Image deployment](https://valen-team.github.io/docs/valen/sglang-image/) · [Plugin deployment](https://valen-team.github.io/docs/valen/sglang-plugin/).
 
-#### vLLM
+#### vLLM image
 
-For a prebuilt container, use the [vLLM image guide](serving/vllm/docker/README.md).
+Start the prebuilt image with an NVIDIA GPU, a CUDA 13-compatible driver, and NVIDIA Container Toolkit:
+
+```bash
+docker pull ghcr.io/valen-team/vllm:valen-v0.1.0
+docker run --rm --gpus device=0 --ipc=host \
+  -p 127.0.0.1:8000:8000 \
+  -v "$HOME/.cache/huggingface:/root/.cache/huggingface" \
+  ghcr.io/valen-team/vllm:valen-v0.1.0 \
+  --model-path Valen-Team/Valen-2B --served-model-name valen
+```
+
+#### vLLM plugin
 
 Install the `valen-vllm` plugin in the [required vLLM environment](serving/vllm/README.md), then start the service:
 
