@@ -2,7 +2,7 @@
 
 在兼容的现有 SGLang 环境中安装一个小型 `valen-sglang` wheel，即可获得 Valen 原生决策支持。这是预构建 Valen-Team 镜像和 Transformers 直接推理之外的一种部署方式，底层仍使用 SGLang 引擎。
 
-当前为实验版本。部署前请阅读 `VALIDATION.md`，确认已验证的环境及检查范围。
+部署前请阅读 `VALIDATION.md`，确认已验证的环境及检查范围。
 
 ## 安装了什么
 

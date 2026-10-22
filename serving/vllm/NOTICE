@@ -1,0 +1,9 @@
+Valen vLLM serving kit
+Copyright 2026 Valen-Team
+Licensed under Apache License 2.0, see LICENSE.
+
+The prompt compiler, layout format and Mixer implementation are adapted from
+Valen-Team's SGLang serving kit in this repository, also Apache-2.0.
+The plugin imports and subclasses vLLM APIs (Copyright contributors to the vLLM
+project, Apache-2.0) and Hugging Face Transformers APIs (Apache-2.0).
+It contains no vLLM engine source or model weights.

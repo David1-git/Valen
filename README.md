@@ -121,7 +121,7 @@ Earlier results remain in the [archived README](history/README_preview.md).
 
 ## Quick start
 
-For a local HTTP service, start with the [SGLang deployment guide](docs/inference.md). For Python examples, use the Cookbook notebooks: **[API quick start](cookbook/api_quickstart.ipynb)** · **[Transformers local inference](cookbook/local_inference.ipynb)**. Both use real evaluation cases with input previews, executable cells and saved results. 简体中文：[API 入门](cookbook/api_quickstart_zh.ipynb) · [下载与本地推理](cookbook/local_inference_zh.ipynb).
+For a local HTTP service, start with the [local deployment guide](docs/inference.md). For Python examples, use the Cookbook notebooks: **[API quick start](cookbook/api_quickstart.ipynb)** · **[Transformers local inference](cookbook/local_inference.ipynb)**. Both use real evaluation cases with input previews, executable cells and saved results. 简体中文：[API 入门](cookbook/api_quickstart_zh.ipynb) · [下载与本地推理](cookbook/local_inference_zh.ipynb).
 
 <a id="api-usage"></a>
 
@@ -242,6 +242,17 @@ curl http://localhost:30000/v1/systemone \
 ```
 
 Full instructions: [Image deployment](https://valen-team.github.io/docs/valen/sglang-image/) · [Plugin deployment](https://valen-team.github.io/docs/valen/sglang-plugin/).
+
+#### vLLM plugin
+
+Install the `valen-vllm` plugin in the [required vLLM environment](serving/vllm/README.md), then start the service:
+
+```bash
+MODEL=/path/to/Valen-2B CUDA_VISIBLE_DEVICES=0 bash /path/to/vllm-kit/serve.sh
+python /path/to/vllm-kit/example_client.py
+```
+
+The default address is `127.0.0.1:8000`. Text/image requests use the same `/v1/systemone` format as SGLang.
 
 #### Transformers
 

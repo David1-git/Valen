@@ -2,7 +2,7 @@
 
 Install native Valen decision support as a small `valen-sglang` wheel in an existing, compatible SGLang environment. This is a deployment alternative to the prebuilt Valen-Team image and direct Transformers inference; it uses the same SGLang engine as the image.
 
-The kit is experimental. See `VALIDATION.md` for the exact environment and completed checks before using it in a deployment.
+See `VALIDATION.md` for the exact environment and completed checks before using it in a deployment.
 
 ## What gets installed
 

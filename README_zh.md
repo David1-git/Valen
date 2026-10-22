@@ -121,7 +121,7 @@ Valen 也已接入 [Jev Decision Index](https://huggingface.co/spaces/multimodal
 
 ## 快速开始
 
-启动本地 HTTP 服务请阅读 [SGLang 部署指南](docs/inference_zh.md)；Python 示例请参考 Cookbook Notebook：**[API 入门](cookbook/api_quickstart_zh.ipynb)** · **[Transformers 本地推理](cookbook/local_inference_zh.ipynb)**。两份教程都使用真实验证案例，展示输入、可执行代码和已保存结果。English: [API](cookbook/api_quickstart.ipynb) · [Local inference](cookbook/local_inference.ipynb).
+启动本地 HTTP 服务请阅读 [本地部署指南](docs/inference_zh.md)；Python 示例请参考 Cookbook Notebook：**[API 入门](cookbook/api_quickstart_zh.ipynb)** · **[Transformers 本地推理](cookbook/local_inference_zh.ipynb)**。两份教程都使用真实验证案例，展示输入、可执行代码和已保存结果。English: [API](cookbook/api_quickstart.ipynb) · [Local inference](cookbook/local_inference.ipynb).
 
 <a id="api-usage"></a>
 
@@ -242,6 +242,17 @@ curl http://localhost:30000/v1/systemone \
 ```
 
 详细步骤：[镜像部署](https://valen-team.github.io/zh-Hans/docs/valen/sglang-image/) · [插件部署](https://valen-team.github.io/zh-Hans/docs/valen/sglang-plugin/)。
+
+#### vLLM 插件
+
+在[指定版本的 vLLM 环境](serving/vllm/README_zh.md)中安装 `valen-vllm` 插件，再启动服务：
+
+```bash
+MODEL=/path/to/Valen-2B CUDA_VISIBLE_DEVICES=0 bash /path/to/vllm-kit/serve.sh
+python /path/to/vllm-kit/example_client.py
+```
+
+默认地址为 `127.0.0.1:8000`，文本/图片请求使用与 SGLang 相同的 `/v1/systemone` 格式。
 
 #### Transformers
 
