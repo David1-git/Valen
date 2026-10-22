@@ -243,7 +243,9 @@ curl http://localhost:30000/v1/systemone \
 
 详细步骤：[镜像部署](https://valen-team.github.io/zh-Hans/docs/valen/sglang-image/) · [插件部署](https://valen-team.github.io/zh-Hans/docs/valen/sglang-plugin/)。
 
-#### vLLM 插件
+#### vLLM
+
+使用预构建容器请参考 [vLLM 镜像部署](serving/vllm/docker/README_zh.md)。
 
 在[指定版本的 vLLM 环境](serving/vllm/README_zh.md)中安装 `valen-vllm` 插件，再启动服务：
 

@@ -243,7 +243,9 @@ curl http://localhost:30000/v1/systemone \
 
 Full instructions: [Image deployment](https://valen-team.github.io/docs/valen/sglang-image/) · [Plugin deployment](https://valen-team.github.io/docs/valen/sglang-plugin/).
 
-#### vLLM plugin
+#### vLLM
+
+For a prebuilt container, use the [vLLM image guide](serving/vllm/docker/README.md).
 
 Install the `valen-vllm` plugin in the [required vLLM environment](serving/vllm/README.md), then start the service:
 
