@@ -34,7 +34,7 @@ Valen（万澜）将视觉感知引入 System One 决策。受 [Jev](https://typ
 ## 最新动态
 
 - **2026-10-21**：官网[聊天](https://valen-team.github.io/zh-Hans/)与[中英文文档](https://valen-team.github.io/zh-Hans/docs/)上线；提供无需 Key 的[免费决策 API](#api-usage)。
-
+- **2026-10-18**：发布[JevalKit](https://github.com/Valen-Team/JevalKit)，一个面向 Jev 类决策模型的开源评测工具，提供统一的模型接口和已整理的评测数据。 [🤗 JevalKit 排行榜](https://huggingface.co/spaces/Valen-Team/JevalKit-Leaderboard)。
 - **2026-10-13**：发布 Valen 模型的 ONNX 和 GGUF 版本，可在 [Hugging Face](https://huggingface.co/Valen-Team) 下载。
 - **2026-10-13**：支持通过 API 调用 `valen-preview-0923`、`valen-0-8b`、`valen-2b` 和 `valen-4b`，使用示例见 [API 入门 Notebook](cookbook/api_quickstart_zh.ipynb)。
 - **2026-10-07**：**更快、更准、更通用。** 发布支持文本、图像和视频的最新多模态 System One 模型 **Valen（[0.8B](https://huggingface.co/Valen-Team/Valen-0.8B) / [2B](https://huggingface.co/Valen-Team/Valen-2B) / [4B](https://huggingface.co/Valen-Team/Valen-4B)）**，以及 [**VisualDecisionBench**](https://huggingface.co/datasets/Valen-Team/VisualDecisionBench) 评测基准。
