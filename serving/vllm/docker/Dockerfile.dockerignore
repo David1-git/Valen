@@ -1,0 +1,9 @@
+**
+!serving/
+!serving/vllm/
+!serving/vllm/**
+serving/vllm/dist/
+serving/vllm/build/
+serving/vllm/**/*.egg-info/
+serving/vllm/**/__pycache__/
+serving/vllm/.ruff_cache/

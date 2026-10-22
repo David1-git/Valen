@@ -1,0 +1,55 @@
+name: Build candidate Valen vLLM image
+
+on:
+  push:
+    branches: [build/valen-vllm-image]
+    paths:
+      - serving/vllm/**
+      - .github/workflows/build-valen-vllm-image.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+
+concurrency:
+  group: valen-vllm-candidate
+  cancel-in-progress: false
+
+jobs:
+  candidate:
+    if: github.repository == 'Valen-Team/Valen' && github.ref == 'refs/heads/build/valen-vllm-image'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+      - name: Reclaim runner space
+        run: |
+          sudo rm -rf /usr/local/lib/android /opt/ghc /usr/share/dotnet /opt/hostedtoolcache
+          docker system prune -af
+          df -h /
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build and push candidate only
+        id: build
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: serving/vllm/docker/Dockerfile
+          platforms: linux/amd64
+          push: true
+          tags: ghcr.io/valen-team/vllm:candidate-sha-${{ github.sha }}
+          build-args: VCS_REF=${{ github.sha }}
+          provenance: mode=max
+          sbom: true
+      - name: Record candidate digest
+        env:
+          IMAGE_DIGEST: ${{ steps.build.outputs.digest }}
+        run: |
+          echo 'Candidate only; final GPU verification and release review required.' >> "$GITHUB_STEP_SUMMARY"
+          echo "Image: ghcr.io/valen-team/vllm:candidate-sha-${GITHUB_SHA}" >> "$GITHUB_STEP_SUMMARY"
+          echo "Digest: ${IMAGE_DIGEST}" >> "$GITHUB_STEP_SUMMARY"
