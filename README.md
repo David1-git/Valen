@@ -34,7 +34,7 @@ Valen (万澜) brings visual perception to System One decision-making. Inspired 
 ## News
 
 - **2026-10-21**: The [web chat](https://valen-team.github.io/) and [bilingual documentation](https://valen-team.github.io/docs/) are live, with a [free decision API](#api-usage) requiring no key.
-- **2026-10-18**: Released [JevalKit](https://github.com/Valen-Team/JevalKit), an open-source evaluation toolkit for Jev-like decision models, providing unified model interfaces and prepared evaluation datasets. The [🤗 JevalKit Leaderboard](https://huggingface.co/spaces/Valen-Team/JevalKit-Leaderboard)
+- **2026-10-18**: Released [JevalKit](https://github.com/Valen-Team/JevalKit), an open-source evaluation toolkit for Jev-like decision models, providing unified model interfaces and prepared evaluation datasets. The [🤗 JevalKit Leaderboard](https://huggingface.co/spaces/Valen-Team/JevalKit-Leaderboard).
 - **2026-10-13**: Released ONNX and GGUF versions of Valen models, available on [Hugging Face](https://huggingface.co/Valen-Team).
 - **2026-10-13**: Added API access to `valen-preview-0923`, `valen-0-8b`, `valen-2b` and `valen-4b`. See the [API quick start notebook](cookbook/api_quickstart.ipynb) for usage examples.
 - **2026-10-07**: **Faster, more accurate, more versatile.** Released the latest multimodal System One model **Valen ([0.8B](https://huggingface.co/Valen-Team/Valen-0.8B), [2B](https://huggingface.co/Valen-Team/Valen-2B) and [4B](https://huggingface.co/Valen-Team/Valen-4B))**, supporting text, images and video, and the [**VisualDecisionBench**](https://huggingface.co/datasets/Valen-Team/VisualDecisionBench) benchmark.
